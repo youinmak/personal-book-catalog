@@ -69,19 +69,30 @@ class BookControllerIntegrationTest {
         Book book = new Book();
         book.setBookNameEn("Old Name");
         book.setAuthorNameEn("Old Author");
+        book.setReadingStatus(ReadingStatus.UNREAD);
+        book.setGenre("Unknown");
+        book.setBookLanguage("Unknown");
         book = bookRepository.save(book);
 
         mockMvc.perform(post("/books/{id}/update", book.getId())
                         .param("bookNameEn", "New Name")
                         .param("bookNameMr", "नवीन नाव")
                         .param("authorNameEn", "New Author")
-                        .param("authorNameMr", "नवीन लेखक"))
+                        .param("authorNameMr", "नवीन लेखक")
+                        .param("readingStatus", "FINISHED")
+                        .param("rating", "4")
+                        .param("genre", "Fiction")
+                        .param("bookLanguage", "English")
+                        .param("customTags", "memoir")
+                        .param("customCategories", "classics"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/books"));
 
         Book updated = bookRepository.findById(book.getId()).orElseThrow();
         assertThat(updated.getBookNameEn()).isEqualTo("New Name");
         assertThat(updated.getAuthorNameMr()).isEqualTo("नवीन लेखक");
+        assertThat(updated.getReadingStatus()).isEqualTo(ReadingStatus.FINISHED);
+        assertThat(updated.getRating()).isEqualTo(4);
     }
 
     @Test
@@ -89,6 +100,9 @@ class BookControllerIntegrationTest {
         Book book = new Book();
         book.setBookNameEn("To Delete");
         book.setAuthorNameEn("Author");
+        book.setReadingStatus(ReadingStatus.UNREAD);
+        book.setGenre("Unknown");
+        book.setBookLanguage("Unknown");
         book = bookRepository.save(book);
 
         mockMvc.perform(post("/books/{id}/delete", book.getId()))
@@ -105,16 +119,68 @@ class BookControllerIntegrationTest {
         one.setAuthorNameEn("James Clear");
         one.setBookNameMr("अॅटोमिक हॅबिट्स");
         one.setAuthorNameMr("जेम्स क्लिअर");
+        one.setReadingStatus(ReadingStatus.FINISHED);
+        one.setGenre("Self-Help");
+        one.setBookLanguage("English");
         bookRepository.save(one);
 
         Book two = new Book();
         two.setBookNameEn("Clean Code");
         two.setAuthorNameEn("Robert Martin");
+        two.setReadingStatus(ReadingStatus.UNREAD);
+        two.setGenre("Technology");
+        two.setBookLanguage("English");
         bookRepository.save(two);
 
         mockMvc.perform(get("/books").param("query", "जेम्स"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Atomic Habits")))
                 .andExpect(content().string(not(containsString("Clean Code"))));
+    }
+
+    @Test
+    void filterAndSort_shouldApplyCombinedCriteria() throws Exception {
+        Book one = new Book();
+        one.setBookNameEn("Book One");
+        one.setAuthorNameEn("Author A");
+        one.setReadingStatus(ReadingStatus.FINISHED);
+        one.setRating(5);
+        one.setGenre("Fiction");
+        one.setBookLanguage("English");
+        one.setCustomTags("memoir, dalit");
+        bookRepository.save(one);
+
+        Book two = new Book();
+        two.setBookNameEn("Book Two");
+        two.setAuthorNameEn("Author B");
+        two.setReadingStatus(ReadingStatus.FINISHED);
+        two.setRating(3);
+        two.setGenre("Fiction");
+        two.setBookLanguage("English");
+        two.setCustomTags("memoir");
+        bookRepository.save(two);
+
+        Book noMatch = new Book();
+        noMatch.setBookNameEn("Book Three");
+        noMatch.setAuthorNameEn("Author C");
+        noMatch.setReadingStatus(ReadingStatus.UNREAD);
+        noMatch.setRating(5);
+        noMatch.setGenre("Mystery");
+        noMatch.setBookLanguage("Marathi");
+        noMatch.setCustomTags("science");
+        bookRepository.save(noMatch);
+
+        mockMvc.perform(get("/books")
+                        .param("readingStatus", "FINISHED")
+                        .param("minRating", "4")
+                        .param("genre", "Fiction")
+                        .param("bookLanguage", "English")
+                        .param("tags", "dalit")
+                        .param("sortBy", "rating")
+                        .param("sortDir", "desc"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Book One")))
+                .andExpect(content().string(not(containsString("Book Two"))))
+                .andExpect(content().string(not(containsString("Book Three"))));
     }
 }

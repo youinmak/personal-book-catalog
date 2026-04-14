@@ -21,6 +21,9 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+/**
+ * Imports initial CSV data only once on first startup.
+ */
 @Component
 public class BookCsvDataInitializer implements ApplicationRunner {
 
@@ -31,6 +34,9 @@ public class BookCsvDataInitializer implements ApplicationRunner {
     private final boolean bootstrapEnabled;
     private final String markerPath;
 
+    /**
+     * Creates the initializer with configured paths and flags.
+     */
     public BookCsvDataInitializer(BookRepository bookRepository,
                                   @Value("${app.bootstrap.book-csv-path:./data/BookList.csv}") String csvPath,
                                   @Value("${app.bootstrap.enabled:true}") boolean bootstrapEnabled,
@@ -41,6 +47,9 @@ public class BookCsvDataInitializer implements ApplicationRunner {
         this.markerPath = markerPath;
     }
 
+    /**
+     * Runs bootstrap import if enabled, marker is absent, and database has no rows.
+     */
     @Override
     public void run(ApplicationArguments args) {
         if (!bootstrapEnabled) {
@@ -92,6 +101,9 @@ public class BookCsvDataInitializer implements ApplicationRunner {
                 Book book = new Book();
                 book.setBookNameEn(bookNameEn);
                 book.setAuthorNameEn(authorNameEn);
+                book.setReadingStatus(ReadingStatus.FINISHED);
+                book.setGenre("Unknown");
+                book.setBookLanguage("Marathi");
                 books.add(book);
             }
         } catch (IOException exception) {
@@ -108,6 +120,9 @@ public class BookCsvDataInitializer implements ApplicationRunner {
         logger.info("Imported {} books from CSV file: {}", books.size(), filePath.toAbsolutePath());
     }
 
+    /**
+     * Trims text and converts blanks to null.
+     */
     private String normalize(String value) {
         if (value == null) {
             return null;
@@ -116,6 +131,9 @@ public class BookCsvDataInitializer implements ApplicationRunner {
         return trimmed.isEmpty() ? null : trimmed;
     }
 
+    /**
+     * Persists marker file indicating bootstrap completion.
+     */
     private void writeMarker(Path doneMarker) {
         try {
             Path parent = doneMarker.getParent();
