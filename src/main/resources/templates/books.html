@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Book Catalog</title>
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --text: #1c2431;
+            --accent: #0f6b42;
+            --danger: #b42318;
+            --line: #d6dce6;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: "Noto Sans", "Noto Sans Devanagari", "Segoe UI", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #e9f3ef 0%, #f4f6fb 60%, #ecf2ff 100%);
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        h1, h2 {
+            margin-top: 0;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 18px rgba(18, 31, 53, 0.05);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(240px, 1fr));
+            gap: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .actions {
+            margin-top: 14px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .search-row .search-input {
+            flex: 1 1 360px;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-link {
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #ffffff;
+        }
+
+        .btn-muted {
+            background: #e7ebf3;
+            color: #293142;
+        }
+
+        .alert {
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #def7e9;
+            color: #0f5132;
+            border: 1px solid #9eddb9;
+        }
+
+        .alert-error {
+            background: #fde4e2;
+            color: #7a271a;
+            border: 1px solid #f7b4b0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border-top: 1px solid var(--line);
+            vertical-align: top;
+            padding: 10px 8px;
+            text-align: left;
+        }
+
+        tr:first-child th {
+            border-top: none;
+        }
+
+        .row-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(190px, 1fr));
+            gap: 8px;
+        }
+
+        .empty {
+            color: #5c6677;
+            padding: 8px 0;
+        }
+
+        @media (max-width: 900px) {
+            .grid, .row-form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Personal Book Catalog</h1>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+    <section class="card">
+        <h2>Add New Book</h2>
+        <form th:action="@{/books}" th:object="${newBookForm}" method="post">
+            <div class="grid">
+                <div>
+                    <label for="bookNameEn">Book Name (English) *</label>
+                    <input id="bookNameEn" type="text" th:field="*{bookNameEn}" required>
+                </div>
+                <div>
+                    <label for="bookNameMr">Book Name (Marathi)</label>
+                    <input id="bookNameMr" type="text" th:field="*{bookNameMr}">
+                </div>
+                <div>
+                    <label for="authorNameEn">Author Name (English) *</label>
+                    <input id="authorNameEn" type="text" th:field="*{authorNameEn}" required>
+                </div>
+                <div>
+                    <label for="authorNameMr">Author Name (Marathi)</label>
+                    <input id="authorNameMr" type="text" th:field="*{authorNameMr}">
+                </div>
+            </div>
+            <div class="actions">
+                <button type="submit" class="btn-primary">Add Book</button>
+                <button type="reset" class="btn-muted">Clear</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>Catalog</h2>
+        <form th:action="@{/books}" method="get" class="search-row">
+            <div class="search-input">
+                <label for="query">Search by Book/Author (English/Marathi)</label>
+                <input id="query" name="query" type="text" th:value="${searchQuery}" placeholder="Type book name or author name">
+            </div>
+            <div class="actions">
+                <button type="submit" class="btn-primary">Search</button>
+                <a th:href="@{/books}" class="btn-link btn-muted">Clear</a>
+            </div>
+        </form>
+        <p class="empty" th:if="${searchQuery != null and !#strings.isEmpty(searchQuery)}">
+            Showing <span th:text="${#lists.size(books)}"></span> result(s) for "<span th:text="${searchQuery}"></span>"
+        </p>
+        <p class="empty" th:if="${#lists.isEmpty(books)}">No books yet. Add your first entry above.</p>
+
+        <table th:if="${!#lists.isEmpty(books)}">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Details</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="book : ${books}">
+                <td th:text="${book.id}"></td>
+                <td>
+                    <form class="row-form" th:action="@{|/books/${book.id}/update|}" method="post">
+                        <div>
+                            <label>Book Name (English) *</label>
+                            <input name="bookNameEn" type="text" required th:value="${book.bookNameEn}">
+                        </div>
+                        <div>
+                            <label>Book Name (Marathi)</label>
+                            <input name="bookNameMr" type="text" th:value="${book.bookNameMr}">
+                        </div>
+                        <div>
+                            <label>Author Name (English) *</label>
+                            <input name="authorNameEn" type="text" required th:value="${book.authorNameEn}">
+                        </div>
+                        <div>
+                            <label>Author Name (Marathi)</label>
+                            <input name="authorNameMr" type="text" th:value="${book.authorNameMr}">
+                        </div>
+                        <div class="actions">
+                            <button type="submit" class="btn-primary">Update</button>
+                        </div>
+                    </form>
+                </td>
+                <td>
+                    <form th:action="@{|/books/${book.id}/delete|}" method="post">
+                        <button type="submit" class="btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+</body>
+</html>
