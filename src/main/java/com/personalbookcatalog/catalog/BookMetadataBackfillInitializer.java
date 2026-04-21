@@ -46,6 +46,10 @@ public class BookMetadataBackfillInitializer implements ApplicationRunner {
                 book.setBookLanguage("Unknown");
                 updated = true;
             }
+            if (!hasText(book.getLocation())) {
+                book.setLocation("Asad");
+                updated = true;
+            }
             if (updated) {
                 changed++;
             }

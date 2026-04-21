@@ -26,12 +26,19 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 0 auto;
             padding: 24px;
         }
 
-        h1, h2 {
+        .top-layout {
+            display: grid;
+            grid-template-columns: 2.1fr 1fr;
+            gap: 16px;
+            align-items: start;
+        }
+
+        h1, h2, h3 {
             margin-top: 0;
         }
 
@@ -56,6 +63,14 @@
             gap: 12px;
         }
 
+        .wishlist-block {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #fbfcff;
+        }
+
         label {
             display: block;
             font-size: 0.9rem;
@@ -71,7 +86,7 @@
         }
 
         .actions {
-            margin-top: 14px;
+            margin-top: 10px;
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
@@ -154,6 +169,44 @@
             padding: 8px 0;
         }
 
+        .wishlist-item {
+            border-top: 1px solid var(--line);
+            padding: 8px 0;
+        }
+
+        .wishlist-item:first-child {
+            border-top: none;
+        }
+
+        .pagination {
+            margin-top: 14px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .page-link {
+            display: inline-block;
+            padding: 7px 10px;
+            border-radius: 8px;
+            background: #eef2f8;
+            color: #2b3550;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .page-link.active {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        @media (max-width: 1000px) {
+            .top-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 900px) {
             .grid, .grid-3, .row-form {
                 grid-template-columns: 1fr;
@@ -164,80 +217,157 @@
 <body>
 <div class="container">
     <h1>Personal Book Catalog</h1>
-
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
     <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
 
-    <section class="card">
-        <h2>Add New Book</h2>
-        <form th:action="@{/books}" th:object="${newBookForm}" method="post">
-            <div class="grid">
-                <div>
-                    <label for="bookNameEn">Book Name (English) *</label>
-                    <input id="bookNameEn" type="text" th:field="*{bookNameEn}" required>
+    <div class="top-layout">
+        <section class="card">
+            <h2>Add New Book</h2>
+            <form th:action="@{/books}" th:object="${newBookForm}" method="post">
+                <div class="grid">
+                    <div>
+                        <label for="bookNameEn">Book Name (English) *</label>
+                        <input id="bookNameEn" type="text" th:field="*{bookNameEn}" required>
+                    </div>
+                    <div>
+                        <label for="bookNameMr">Book Name (Marathi)</label>
+                        <input id="bookNameMr" type="text" th:field="*{bookNameMr}">
+                    </div>
+                    <div>
+                        <label for="authorNameEn">Author Name (English) *</label>
+                        <input id="authorNameEn" type="text" th:field="*{authorNameEn}" required>
+                    </div>
+                    <div>
+                        <label for="authorNameMr">Author Name (Marathi)</label>
+                        <input id="authorNameMr" type="text" th:field="*{authorNameMr}">
+                    </div>
+                    <div>
+                        <label for="readingStatus">Reading Status</label>
+                        <select id="readingStatus" th:field="*{readingStatus}">
+                            <option th:each="status : ${readingStatuses}" th:value="${status}" th:text="${status}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="rating">Rating (1-5)</label>
+                        <select id="rating" th:field="*{rating}">
+                            <option value="">Not rated</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="genre">Genre</label>
+                        <input id="genre" type="text" list="genre-options" th:field="*{genre}" placeholder="Fiction">
+                    </div>
+                    <div>
+                        <label for="bookLanguage">Book Language</label>
+                        <input id="bookLanguage" type="text" list="language-options" th:field="*{bookLanguage}" placeholder="English">
+                    </div>
+                    <div>
+                        <label for="location">Location</label>
+                        <input id="location" type="text" th:field="*{location}" placeholder="Asad">
+                    </div>
+                    <div>
+                        <label for="customTags">Custom Tags (comma-separated)</label>
+                        <input id="customTags" type="text" th:field="*{customTags}" placeholder="dalit literature, memoir">
+                    </div>
+                    <div>
+                        <label for="customCategories">Custom Categories (comma-separated)</label>
+                        <input id="customCategories" type="text" th:field="*{customCategories}" placeholder="classics, must-read">
+                    </div>
                 </div>
-                <div>
-                    <label for="bookNameMr">Book Name (Marathi)</label>
-                    <input id="bookNameMr" type="text" th:field="*{bookNameMr}">
+                <div class="actions">
+                    <button type="submit" class="btn-primary">Add Book</button>
+                    <button type="reset" class="btn-muted">Clear</button>
                 </div>
-                <div>
-                    <label for="authorNameEn">Author Name (English) *</label>
-                    <input id="authorNameEn" type="text" th:field="*{authorNameEn}" required>
-                </div>
-                <div>
-                    <label for="authorNameMr">Author Name (Marathi)</label>
-                    <input id="authorNameMr" type="text" th:field="*{authorNameMr}">
-                </div>
-                <div>
-                    <label for="readingStatus">Reading Status</label>
-                    <select id="readingStatus" th:field="*{readingStatus}">
-                        <option th:each="status : ${readingStatuses}" th:value="${status}" th:text="${status}"></option>
+            </form>
+            <datalist id="genre-options">
+                <option th:each="item : ${genreSuggestions}" th:value="${item}"></option>
+            </datalist>
+            <datalist id="language-options">
+                <option th:each="item : ${languageSuggestions}" th:value="${item}"></option>
+            </datalist>
+        </section>
+
+        <section class="card">
+            <h2>Wishlists</h2>
+
+            <div class="wishlist-block">
+                <label for="newWishlistName">Create Wishlist</label>
+                <form th:action="@{/wishlists}" th:object="${newWishlistForm}" method="post">
+                    <input id="newWishlistName" type="text" th:field="*{name}" placeholder="Wishlist name" required>
+                    <div class="actions">
+                        <button type="submit" class="btn-primary">Create</button>
+                    </div>
+                </form>
+            </div>
+
+            <div th:if="${activeWishlist != null}" class="wishlist-block">
+                <label for="activeWishlistSelect">Active Wishlist</label>
+                <form th:action="@{/books}" method="get">
+                    <select id="activeWishlistSelect" name="wishlistId" onchange="this.form.submit()">
+                        <option th:each="wishlist : ${wishlists}"
+                                th:value="${wishlist.id}"
+                                th:text="${wishlist.name}"
+                                th:selected="${wishlist.id == activeWishlistId}">
+                        </option>
                     </select>
+                </form>
+            </div>
+
+            <div th:if="${activeWishlist != null}" class="wishlist-block">
+                <label for="renameWishlistName">Rename Active Wishlist</label>
+                <form th:action="@{|/wishlists/${activeWishlist.id}/rename|}" th:object="${renameWishlistForm}" method="post">
+                    <input id="renameWishlistName" type="text" th:field="*{name}" required>
+                    <div class="actions">
+                        <button type="submit" class="btn-primary">Rename</button>
+                    </div>
+                </form>
+                <form th:action="@{|/wishlists/${activeWishlist.id}/delete|}" method="post" class="actions">
+                    <button type="submit" class="btn-danger">Delete Wishlist</button>
+                </form>
+            </div>
+
+            <div th:if="${activeWishlist != null}" class="wishlist-block">
+                <h3 th:text="${activeWishlist.name}"></h3>
+                <form th:action="@{|/wishlists/${activeWishlist.id}/items|}" th:object="${newWishlistItemForm}" method="post">
+                    <label for="wishlistBookName">Book Name (English)</label>
+                    <input id="wishlistBookName" type="text" th:field="*{bookNameEn}" required>
+                    <label for="wishlistAuthorName">Author Name (English)</label>
+                    <input id="wishlistAuthorName" type="text" th:field="*{authorNameEn}" required>
+                    <div class="actions">
+                        <button type="submit" class="btn-primary">Add Item</button>
+                    </div>
+                </form>
+
+                <div th:if="${#lists.isEmpty(activeWishlist.items)}" class="empty">
+                    No items in this wishlist.
                 </div>
-                <div>
-                    <label for="rating">Rating (1-5)</label>
-                    <select id="rating" th:field="*{rating}">
-                        <option value="">Not rated</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="genre">Genre</label>
-                    <input id="genre" type="text" list="genre-options" th:field="*{genre}" placeholder="Fiction">
-                </div>
-                <div>
-                    <label for="bookLanguage">Book Language</label>
-                    <input id="bookLanguage" type="text" list="language-options" th:field="*{bookLanguage}" placeholder="English">
-                </div>
-                <div>
-                    <label for="customTags">Custom Tags (comma-separated)</label>
-                    <input id="customTags" type="text" th:field="*{customTags}" placeholder="dalit literature, memoir">
-                </div>
-                <div>
-                    <label for="customCategories">Custom Categories (comma-separated)</label>
-                    <input id="customCategories" type="text" th:field="*{customCategories}" placeholder="classics, must-read">
+
+                <div th:if="${!#lists.isEmpty(activeWishlist.items)}">
+                    <div class="wishlist-item" th:each="item : ${activeWishlist.items}">
+                        <div><strong th:text="${item.bookNameEn}"></strong></div>
+                        <div th:text="${item.authorNameEn}"></div>
+                        <form th:action="@{|/wishlists/${activeWishlist.id}/items/${item.id}/delete|}" method="post" class="actions">
+                            <button type="submit" class="btn-danger">Delete Item</button>
+                        </form>
+                    </div>
                 </div>
             </div>
-            <div class="actions">
-                <button type="submit" class="btn-primary">Add Book</button>
-                <button type="reset" class="btn-muted">Clear</button>
+
+            <div th:if="${activeWishlist == null}" class="empty">
+                No wishlists available.
             </div>
-        </form>
-        <datalist id="genre-options">
-            <option th:each="item : ${genreSuggestions}" th:value="${item}"></option>
-        </datalist>
-        <datalist id="language-options">
-            <option th:each="item : ${languageSuggestions}" th:value="${item}"></option>
-        </datalist>
-    </section>
+        </section>
+    </div>
 
     <section class="card">
         <h2>Catalog</h2>
         <form th:action="@{/books}" th:object="${criteria}" method="get">
+            <input type="hidden" name="wishlistId" th:value="${activeWishlistId}">
             <div class="grid-3">
                 <div>
                     <label for="query">Search (all fields)</label>
@@ -301,7 +431,7 @@
                 <a th:href="@{/books}" class="btn-link btn-muted">Clear</a>
             </div>
         </form>
-        <p class="empty">Showing <span th:text="${#lists.size(books)}"></span> result(s)</p>
+        <p class="empty">Showing <span th:text="${#lists.size(books)}"></span> of <span th:text="${totalResults}"></span> result(s)</p>
         <p class="empty" th:if="${#lists.isEmpty(books)}">No books found for current criteria.</p>
 
         <table th:if="${!#lists.isEmpty(books)}">
@@ -359,6 +489,10 @@
                             <input name="bookLanguage" type="text" list="language-options" th:value="${book.bookLanguage}">
                         </div>
                         <div>
+                            <label>Location</label>
+                            <input name="location" type="text" th:value="${book.location}">
+                        </div>
+                        <div>
                             <label>Custom Tags</label>
                             <input name="customTags" type="text" th:value="${book.customTags}">
                         </div>
@@ -379,6 +513,63 @@
             </tr>
             </tbody>
         </table>
+
+        <div class="pagination" th:if="${totalPages > 1}">
+            <a class="page-link"
+               th:if="${currentPage > 1}"
+               th:href="@{/books(
+                    page=${currentPage - 1},
+                    wishlistId=${activeWishlistId},
+                    query=${criteria.query},
+                    readingStatus=${criteria.readingStatus},
+                    minRating=${criteria.minRating},
+                    genre=${criteria.genre},
+                    bookLanguage=${criteria.bookLanguage},
+                    tags=${criteria.tags},
+                    categories=${criteria.categories},
+                    sortBy=${criteria.sortBy},
+                    sortDir=${criteria.sortDir}
+               )}">
+                Previous
+            </a>
+
+            <a th:each="pageNumber : ${#numbers.sequence(1, totalPages)}"
+               class="page-link"
+               th:classappend="${pageNumber == currentPage} ? ' active' : ''"
+               th:text="${pageNumber}"
+               th:href="@{/books(
+                    page=${pageNumber},
+                    wishlistId=${activeWishlistId},
+                    query=${criteria.query},
+                    readingStatus=${criteria.readingStatus},
+                    minRating=${criteria.minRating},
+                    genre=${criteria.genre},
+                    bookLanguage=${criteria.bookLanguage},
+                    tags=${criteria.tags},
+                    categories=${criteria.categories},
+                    sortBy=${criteria.sortBy},
+                    sortDir=${criteria.sortDir}
+               )}">
+            </a>
+
+            <a class="page-link"
+               th:if="${currentPage < totalPages}"
+               th:href="@{/books(
+                    page=${currentPage + 1},
+                    wishlistId=${activeWishlistId},
+                    query=${criteria.query},
+                    readingStatus=${criteria.readingStatus},
+                    minRating=${criteria.minRating},
+                    genre=${criteria.genre},
+                    bookLanguage=${criteria.bookLanguage},
+                    tags=${criteria.tags},
+                    categories=${criteria.categories},
+                    sortBy=${criteria.sortBy},
+                    sortDir=${criteria.sortDir}
+               )}">
+                Next
+            </a>
+        </div>
     </section>
 </div>
 </body>

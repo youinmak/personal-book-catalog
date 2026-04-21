@@ -38,6 +38,9 @@ public class BookForm {
     @Size(max = 120, message = "Book language must be at most 120 characters.")
     private String bookLanguage;
 
+    @Size(max = 120, message = "Location must be at most 120 characters.")
+    private String location;
+
     @Size(max = 1000, message = "Custom tags must be at most 1000 characters.")
     private String customTags;
 
@@ -168,6 +171,20 @@ public class BookForm {
      */
     public void setBookLanguage(String bookLanguage) {
         this.bookLanguage = bookLanguage;
+    }
+
+    /**
+     * Returns location label.
+     */
+    public String getLocation() {
+        return location;
+    }
+
+    /**
+     * Sets location label.
+     */
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     /**

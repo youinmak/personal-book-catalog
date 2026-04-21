@@ -28,8 +28,16 @@ class BookControllerIntegrationTest {
     @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private WishlistRepository wishlistRepository;
+
+    @Autowired
+    private WishlistItemRepository wishlistItemRepository;
+
     @BeforeEach
     void setUp() {
+        wishlistItemRepository.deleteAll();
+        wishlistRepository.deleteAll();
         bookRepository.deleteAll();
     }
 
@@ -37,7 +45,8 @@ class BookControllerIntegrationTest {
     void booksPage_shouldLoad() throws Exception {
         mockMvc.perform(get("/books"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Personal Book Catalog")));
+                .andExpect(content().string(containsString("Personal Book Catalog")))
+                .andExpect(content().string(containsString("Wishlists")));
     }
 
     @Test
@@ -83,6 +92,7 @@ class BookControllerIntegrationTest {
                         .param("rating", "4")
                         .param("genre", "Fiction")
                         .param("bookLanguage", "English")
+                        .param("location", "Shelf A")
                         .param("customTags", "memoir")
                         .param("customCategories", "classics"))
                 .andExpect(status().is3xxRedirection())
@@ -93,6 +103,7 @@ class BookControllerIntegrationTest {
         assertThat(updated.getAuthorNameMr()).isEqualTo("नवीन लेखक");
         assertThat(updated.getReadingStatus()).isEqualTo(ReadingStatus.FINISHED);
         assertThat(updated.getRating()).isEqualTo(4);
+        assertThat(updated.getLocation()).isEqualTo("Shelf A");
     }
 
     @Test
@@ -182,5 +193,35 @@ class BookControllerIntegrationTest {
                 .andExpect(content().string(containsString("Book One")))
                 .andExpect(content().string(not(containsString("Book Two"))))
                 .andExpect(content().string(not(containsString("Book Three"))));
+    }
+
+    @Test
+    void wishlistCrud_shouldCreateRenameAddAndDeleteItem() throws Exception {
+        mockMvc.perform(post("/wishlists").param("name", "Reading Queue"))
+                .andExpect(status().is3xxRedirection());
+
+        Wishlist wishlist = wishlistRepository.findByNameIgnoreCase("Reading Queue").orElseThrow();
+
+        mockMvc.perform(post("/wishlists/{id}/rename", wishlist.getId()).param("name", "Top Picks"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/books?wishlistId=" + wishlist.getId()));
+
+        Wishlist renamed = wishlistRepository.findById(wishlist.getId()).orElseThrow();
+        assertThat(renamed.getName()).isEqualTo("Top Picks");
+
+        mockMvc.perform(post("/wishlists/{id}/items", wishlist.getId())
+                        .param("bookNameEn", "The Pragmatic Programmer")
+                        .param("authorNameEn", "Andy Hunt"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/books?wishlistId=" + wishlist.getId()));
+
+        WishlistItem item = wishlistItemRepository.findAllByWishlistIdOrderByIdAsc(wishlist.getId()).getFirst();
+        assertThat(item.getBookNameEn()).isEqualTo("The Pragmatic Programmer");
+
+        mockMvc.perform(post("/wishlists/{wishlistId}/items/{itemId}/delete", wishlist.getId(), item.getId()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/books?wishlistId=" + wishlist.getId()));
+
+        assertThat(wishlistItemRepository.findAllByWishlistIdOrderByIdAsc(wishlist.getId())).isEmpty();
     }
 }

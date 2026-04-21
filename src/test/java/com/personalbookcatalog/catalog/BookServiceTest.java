@@ -43,6 +43,7 @@ class BookServiceTest {
         assertThat(result.getReadingStatus()).isEqualTo(ReadingStatus.UNREAD);
         assertThat(result.getGenre()).isEqualTo("Unknown");
         assertThat(result.getBookLanguage()).isEqualTo("Unknown");
+        assertThat(result.getLocation()).isEqualTo("Asad");
         assertThat(result.getCustomTags()).isEqualTo("memoir, dalit literature");
         verify(bookRepository).save(any(Book.class));
     }

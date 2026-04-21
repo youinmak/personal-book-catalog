@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 public class BookService {
 
     private static final String UNKNOWN = "Unknown";
+    private static final String DEFAULT_LOCATION = "Asad";
 
     private static final List<String> DEFAULT_GENRES = List.of(
             "Unknown", "Fiction", "Non-Fiction", "Mystery", "Science Fiction",
@@ -160,6 +161,7 @@ public class BookService {
         book.setRating(rating);
         book.setGenre(defaultIfEmpty(form.getGenre(), UNKNOWN));
         book.setBookLanguage(defaultIfEmpty(form.getBookLanguage(), UNKNOWN));
+        book.setLocation(defaultIfEmpty(form.getLocation(), DEFAULT_LOCATION));
         book.setCustomTags(normalizeCsvList(form.getCustomTags()));
         book.setCustomCategories(normalizeCsvList(form.getCustomCategories()));
     }
@@ -178,6 +180,7 @@ public class BookService {
                 || containsIgnoreCase(book.getAuthorNameMr(), q)
                 || containsIgnoreCase(book.getGenre(), q)
                 || containsIgnoreCase(book.getBookLanguage(), q)
+                || containsIgnoreCase(book.getLocation(), q)
                 || containsIgnoreCase(book.getCustomTags(), q)
                 || containsIgnoreCase(book.getCustomCategories(), q)
                 || containsIgnoreCase(book.getReadingStatus() == null ? null : book.getReadingStatus().name(), q);

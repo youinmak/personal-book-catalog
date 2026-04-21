@@ -45,6 +45,9 @@ public class Book {
     @Column(nullable = false, length = 120)
     private String bookLanguage;
 
+    @Column(length = 120)
+    private String location;
+
     @Column(length = 1000)
     private String customTags;
 
@@ -175,6 +178,20 @@ public class Book {
      */
     public void setBookLanguage(String bookLanguage) {
         this.bookLanguage = bookLanguage;
+    }
+
+    /**
+     * Returns shelf/location label for the book.
+     */
+    public String getLocation() {
+        return location;
+    }
+
+    /**
+     * Sets shelf/location label for the book.
+     */
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     /**
