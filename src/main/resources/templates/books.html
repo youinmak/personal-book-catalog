@@ -71,6 +71,15 @@
             background: #fbfcff;
         }
 
+        .wishlist-action-panel {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .wishlist-action-panel.active {
+            display: block;
+        }
+
         label {
             display: block;
             font-size: 0.9rem;
@@ -296,39 +305,54 @@
             <h2>Wishlists</h2>
 
             <div class="wishlist-block">
-                <label for="newWishlistName">Create Wishlist</label>
-                <form th:action="@{/wishlists}" th:object="${newWishlistForm}" method="post">
-                    <input id="newWishlistName" type="text" th:field="*{name}" placeholder="Wishlist name" required>
-                    <div class="actions">
-                        <button type="submit" class="btn-primary">Create</button>
-                    </div>
-                </form>
-            </div>
+                <label for="wishlistAction">Wishlist Action</label>
+                <select id="wishlistAction">
+                    <option value="create">Create Wishlist</option>
+                    <option value="active" th:disabled="${#lists.isEmpty(wishlists)}">Active Wishlist</option>
+                    <option value="rename" th:disabled="${activeWishlist == null}">Rename Active Wishlist</option>
+                </select>
 
-            <div th:if="${activeWishlist != null}" class="wishlist-block">
-                <label for="activeWishlistSelect">Active Wishlist</label>
-                <form th:action="@{/books}" method="get">
-                    <select id="activeWishlistSelect" name="wishlistId" onchange="this.form.submit()">
-                        <option th:each="wishlist : ${wishlists}"
-                                th:value="${wishlist.id}"
-                                th:text="${wishlist.name}"
-                                th:selected="${wishlist.id == activeWishlistId}">
-                        </option>
-                    </select>
-                </form>
-            </div>
+                <div id="wishlist-panel-create" class="wishlist-action-panel active">
+                    <form th:action="@{/wishlists}" th:object="${newWishlistForm}" method="post">
+                        <label for="newWishlistName">Create Wishlist</label>
+                        <input id="newWishlistName" type="text" th:field="*{name}" placeholder="Wishlist name" required>
+                        <div class="actions">
+                            <button type="submit" class="btn-primary">Create</button>
+                        </div>
+                    </form>
+                </div>
 
-            <div th:if="${activeWishlist != null}" class="wishlist-block">
-                <label for="renameWishlistName">Rename Active Wishlist</label>
-                <form th:action="@{|/wishlists/${activeWishlist.id}/rename|}" th:object="${renameWishlistForm}" method="post">
-                    <input id="renameWishlistName" type="text" th:field="*{name}" required>
-                    <div class="actions">
-                        <button type="submit" class="btn-primary">Rename</button>
+                <div id="wishlist-panel-active" class="wishlist-action-panel">
+                    <form th:action="@{/books}" method="get">
+                        <label for="activeWishlistSelect">Active Wishlist</label>
+                        <select id="activeWishlistSelect" name="wishlistId" onchange="this.form.submit()" th:disabled="${#lists.isEmpty(wishlists)}">
+                            <option th:if="${#lists.isEmpty(wishlists)}" value="">No wishlists available</option>
+                            <option th:each="wishlist : ${wishlists}"
+                                    th:value="${wishlist.id}"
+                                    th:text="${wishlist.name}"
+                                    th:selected="${wishlist.id == activeWishlistId}">
+                            </option>
+                        </select>
+                    </form>
+                </div>
+
+                <div id="wishlist-panel-rename" class="wishlist-action-panel">
+                    <div th:if="${activeWishlist != null}">
+                        <form th:action="@{|/wishlists/${activeWishlist.id}/rename|}" th:object="${renameWishlistForm}" method="post">
+                            <label for="renameWishlistName">Rename Active Wishlist</label>
+                            <input id="renameWishlistName" type="text" th:field="*{name}" required>
+                            <div class="actions">
+                                <button type="submit" class="btn-primary">Rename</button>
+                            </div>
+                        </form>
+                        <form th:action="@{|/wishlists/${activeWishlist.id}/delete|}" method="post" class="actions">
+                            <button type="submit" class="btn-danger">Delete Wishlist</button>
+                        </form>
                     </div>
-                </form>
-                <form th:action="@{|/wishlists/${activeWishlist.id}/delete|}" method="post" class="actions">
-                    <button type="submit" class="btn-danger">Delete Wishlist</button>
-                </form>
+                    <div th:if="${activeWishlist == null}" class="empty">
+                        No active wishlist available.
+                    </div>
+                </div>
             </div>
 
             <div th:if="${activeWishlist != null}" class="wishlist-block">
@@ -572,5 +596,25 @@
         </div>
     </section>
 </div>
+<script>
+    (function () {
+        const actionSelect = document.getElementById("wishlistAction");
+        const panels = {
+            create: document.getElementById("wishlist-panel-create"),
+            active: document.getElementById("wishlist-panel-active"),
+            rename: document.getElementById("wishlist-panel-rename")
+        };
+
+        function updateWishlistActionPanel() {
+            const selectedAction = actionSelect.value;
+            Object.keys(panels).forEach(function (key) {
+                panels[key].classList.toggle("active", key === selectedAction);
+            });
+        }
+
+        actionSelect.addEventListener("change", updateWishlistActionPanel);
+        updateWishlistActionPanel();
+    })();
+</script>
 </body>
 </html>
