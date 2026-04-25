@@ -74,6 +74,17 @@ class BookControllerIntegrationTest {
     }
 
     @Test
+    void create_shouldRejectUnsafeHtmlInput() throws Exception {
+        mockMvc.perform(post("/books")
+                        .param("bookNameEn", "<script>alert(1)</script>")
+                        .param("authorNameEn", "Safe Author"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/books"));
+
+        assertThat(bookRepository.count()).isZero();
+    }
+
+    @Test
     void update_shouldModifyExistingBook() throws Exception {
         Book book = new Book();
         book.setBookNameEn("Old Name");
@@ -223,5 +234,23 @@ class BookControllerIntegrationTest {
                 .andExpect(redirectedUrl("/books?wishlistId=" + wishlist.getId()));
 
         assertThat(wishlistItemRepository.findAllByWishlistIdOrderByIdAsc(wishlist.getId())).isEmpty();
+    }
+
+    @Test
+    void createWishlist_shouldRejectUnsafeHtmlInput() throws Exception {
+        mockMvc.perform(post("/wishlists").param("name", "<b>Queue</b>"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/books"));
+
+        assertThat(wishlistRepository.count()).isZero();
+    }
+
+    @Test
+    void booksPage_shouldIgnoreInvalidSortAndQueryInput() throws Exception {
+        mockMvc.perform(get("/books")
+                        .param("sortBy", "id;drop table books")
+                        .param("query", "<script>alert(1)</script>"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Invalid filter input was ignored.")));
     }
 }

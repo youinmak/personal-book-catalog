@@ -3,8 +3,10 @@ package com.personalbookcatalog.catalog;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -39,10 +41,16 @@ public class BookController {
      */
     @GetMapping({"/", "/books"})
     public String getBooksPage(
-            @ModelAttribute("criteria") BookListCriteria criteria,
+            @Valid @ModelAttribute("criteria") BookListCriteria criteria,
+            BindingResult criteriaBindingResult,
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "wishlistId", required = false) Long wishlistId,
             Model model) {
+        if (criteriaBindingResult.hasErrors()) {
+            model.addAttribute("errorMessage", "Invalid filter input was ignored.");
+            criteria = new BookListCriteria();
+            model.addAttribute("criteria", criteria);
+        }
         List<Book> filteredBooks = bookService.findAll(criteria);
         int totalResults = filteredBooks.size();
         int totalPages = Math.max(1, (int) Math.ceil((double) totalResults / BOOKS_PER_PAGE));
@@ -74,10 +82,12 @@ public class BookController {
      * Creates a new book and redirects back to list page.
      */
     @PostMapping("/books")
-    public String createBook(@ModelAttribute("newBookForm") BookForm form, RedirectAttributes redirectAttributes) {
-        if (!isValidEnglishFields(form)) {
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    "Book name (English) and Author name (English) are required.");
+    public String createBook(
+            @Valid @ModelAttribute("newBookForm") BookForm form,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errorMessage", firstValidationMessage(bindingResult));
             redirectAttributes.addFlashAttribute("newBookForm", form);
             return "redirect:/books";
         }
@@ -95,10 +105,13 @@ public class BookController {
      * Updates a book and redirects back to list page.
      */
     @PostMapping("/books/{id}/update")
-    public String updateBook(@PathVariable Long id, @ModelAttribute BookForm form, RedirectAttributes redirectAttributes) {
-        if (!isValidEnglishFields(form)) {
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    "Book name (English) and Author name (English) are required for updates.");
+    public String updateBook(
+            @PathVariable Long id,
+            @Valid @ModelAttribute BookForm form,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errorMessage", firstValidationMessage(bindingResult));
             return "redirect:/books";
         }
         try {
@@ -128,7 +141,14 @@ public class BookController {
      * Creates a new wishlist and makes it active.
      */
     @PostMapping("/wishlists")
-    public String createWishlist(@ModelAttribute WishlistForm form, RedirectAttributes redirectAttributes) {
+    public String createWishlist(
+            @Valid @ModelAttribute WishlistForm form,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errorMessage", firstValidationMessage(bindingResult));
+            return "redirect:/books";
+        }
         try {
             Wishlist wishlist = wishlistService.createWishlist(form.getName());
             redirectAttributes.addFlashAttribute("successMessage", "Wishlist created successfully.");
@@ -145,8 +165,13 @@ public class BookController {
     @PostMapping("/wishlists/{id}/rename")
     public String renameWishlist(
             @PathVariable Long id,
-            @ModelAttribute WishlistRenameForm form,
+            @Valid @ModelAttribute WishlistRenameForm form,
+            BindingResult bindingResult,
             RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errorMessage", firstValidationMessage(bindingResult));
+            return redirectToBooks(id);
+        }
         try {
             wishlistService.renameWishlist(id, form.getName());
             redirectAttributes.addFlashAttribute("successMessage", "Wishlist renamed successfully.");
@@ -177,8 +202,13 @@ public class BookController {
     @PostMapping("/wishlists/{id}/items")
     public String addWishlistItem(
             @PathVariable Long id,
-            @ModelAttribute WishlistItemForm form,
+            @Valid @ModelAttribute WishlistItemForm form,
+            BindingResult bindingResult,
             RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errorMessage", firstValidationMessage(bindingResult));
+            return redirectToBooks(id);
+        }
         try {
             wishlistService.addItem(id, form.getBookNameEn(), form.getAuthorNameEn());
             redirectAttributes.addFlashAttribute("successMessage", "Wishlist item added successfully.");
@@ -203,13 +233,6 @@ public class BookController {
             redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
         }
         return redirectToBooks(wishlistId);
-    }
-
-    /**
-     * Verifies that required English fields are present for catalog books.
-     */
-    private boolean isValidEnglishFields(BookForm form) {
-        return StringUtils.hasText(form.getBookNameEn()) && StringUtils.hasText(form.getAuthorNameEn());
     }
 
     /**
@@ -246,5 +269,18 @@ public class BookController {
             return "redirect:/books";
         }
         return "redirect:/books?wishlistId=" + wishlistId;
+    }
+
+    /**
+     * Returns first field or global validation error message.
+     */
+    private String firstValidationMessage(BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
+            return bindingResult.getFieldErrors().getFirst().getDefaultMessage();
+        }
+        if (bindingResult.hasGlobalErrors()) {
+            return bindingResult.getGlobalErrors().getFirst().getDefaultMessage();
+        }
+        return "Invalid input.";
     }
 }
