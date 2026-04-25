@@ -2,3 +2,12 @@
 /.idea/
 /*.iml
 /.DS_Store
+*.pem
+
+# Terraform local artifacts
+infra/.terraform/
+infra/.terraform.lock.hcl
+infra/terraform.tfstate
+infra/terraform.tfstate.*
+infra/*.tfvars
+infra/*.tfplan
