@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Book Catalog</title>
+    <title th:text="#{app.title}">Personal Book Catalog</title>
     <style>
         :root {
             --bg: #f5f7fb;
@@ -36,6 +36,14 @@
             grid-template-columns: 2.1fr 1fr;
             gap: 16px;
             align-items: start;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         h1, h2, h3 {
@@ -225,41 +233,56 @@
 </head>
 <body>
 <div class="container">
-    <h1>Personal Book Catalog</h1>
+    <div class="header-row">
+        <h1 th:text="#{app.title}">Personal Book Catalog</h1>
+        <div class="actions">
+            <a class="btn-link btn-muted"
+               th:href="@{/books(lang='en',page=${currentPage},wishlistId=${activeWishlistId},query=${criteria.query},readingStatus=${criteria.readingStatus},minRating=${criteria.minRating},genre=${criteria.genre},bookLanguage=${criteria.bookLanguage},tags=${criteria.tags},categories=${criteria.categories},sortBy=${criteria.sortBy},sortDir=${criteria.sortDir})}"
+               th:text="#{lang.english}">EN</a>
+            <a class="btn-link btn-muted"
+               th:href="@{/books(lang='mr',page=${currentPage},wishlistId=${activeWishlistId},query=${criteria.query},readingStatus=${criteria.readingStatus},minRating=${criteria.minRating},genre=${criteria.genre},bookLanguage=${criteria.bookLanguage},tags=${criteria.tags},categories=${criteria.categories},sortBy=${criteria.sortBy},sortDir=${criteria.sortDir})}"
+               th:text="#{lang.marathi}">मराठी</a>
+            <span sec:authorize="isAuthenticated()"><span th:text="#{header.signedInAs}">Signed in as</span> <strong sec:authentication="name"></strong></span>
+            <a sec:authorize="isAnonymous()" th:href="@{/login}" class="btn-link btn-primary" th:text="#{header.login}">Login</a>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post">
+                <button type="submit" class="btn-muted" th:text="#{header.logout}">Logout</button>
+            </form>
+        </div>
+    </div>
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
     <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
 
     <div class="top-layout">
-        <section class="card">
-            <h2>Add New Book</h2>
+        <section class="card" sec:authorize="hasRole('ADMIN')">
+            <h2 th:text="#{section.addBook}">Add New Book</h2>
             <form th:action="@{/books}" th:object="${newBookForm}" method="post">
                 <div class="grid">
                     <div>
-                        <label for="bookNameEn">Book Name (English) *</label>
-                        <input id="bookNameEn" type="text" th:field="*{bookNameEn}" required maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                        <label for="bookNameEn" th:text="#{label.bookNameEn}">Book Name (English) *</label>
+                        <input id="bookNameEn" type="text" th:field="*{bookNameEn}" required maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                     </div>
                     <div>
-                        <label for="bookNameMr">Book Name (Marathi)</label>
-                        <input id="bookNameMr" type="text" th:field="*{bookNameMr}" maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                        <label for="bookNameMr" th:text="#{label.bookNameMr}">Book Name (Marathi)</label>
+                        <input id="bookNameMr" type="text" th:field="*{bookNameMr}" maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                     </div>
                     <div>
-                        <label for="authorNameEn">Author Name (English) *</label>
-                        <input id="authorNameEn" type="text" th:field="*{authorNameEn}" required maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                        <label for="authorNameEn" th:text="#{label.authorNameEn}">Author Name (English) *</label>
+                        <input id="authorNameEn" type="text" th:field="*{authorNameEn}" required maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                     </div>
                     <div>
-                        <label for="authorNameMr">Author Name (Marathi)</label>
-                        <input id="authorNameMr" type="text" th:field="*{authorNameMr}" maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                        <label for="authorNameMr" th:text="#{label.authorNameMr}">Author Name (Marathi)</label>
+                        <input id="authorNameMr" type="text" th:field="*{authorNameMr}" maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                     </div>
                     <div>
-                        <label for="readingStatus">Reading Status</label>
+                        <label for="readingStatus" th:text="#{label.readingStatus}">Reading Status</label>
                         <select id="readingStatus" th:field="*{readingStatus}">
                             <option th:each="status : ${readingStatuses}" th:value="${status}" th:text="${status}"></option>
                         </select>
                     </div>
                     <div>
-                        <label for="rating">Rating (1-5)</label>
+                        <label for="rating" th:text="#{label.rating}">Rating (1-5)</label>
                         <select id="rating" th:field="*{rating}">
-                            <option value="">Not rated</option>
+                            <option value="" th:text="#{option.notRated}">Not rated</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -268,29 +291,29 @@
                         </select>
                     </div>
                     <div>
-                        <label for="genre">Genre</label>
-                        <input id="genre" type="text" list="genre-options" th:field="*{genre}" placeholder="Fiction" maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                        <label for="genre" th:text="#{label.genre}">Genre</label>
+                        <input id="genre" type="text" list="genre-options" th:field="*{genre}" th:placeholder="#{placeholder.genre}" maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                     </div>
                     <div>
-                        <label for="bookLanguage">Book Language</label>
-                        <input id="bookLanguage" type="text" list="language-options" th:field="*{bookLanguage}" placeholder="English" maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                        <label for="bookLanguage" th:text="#{label.bookLanguage}">Book Language</label>
+                        <input id="bookLanguage" type="text" list="language-options" th:field="*{bookLanguage}" th:placeholder="#{placeholder.bookLanguage}" maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                     </div>
                     <div>
-                        <label for="location">Location</label>
-                        <input id="location" type="text" th:field="*{location}" placeholder="Asad" maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                        <label for="location" th:text="#{label.location}">Location</label>
+                        <input id="location" type="text" th:field="*{location}" th:placeholder="#{placeholder.location}" maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                     </div>
                     <div>
-                        <label for="customTags">Custom Tags (comma-separated)</label>
-                        <input id="customTags" type="text" th:field="*{customTags}" placeholder="dalit literature, memoir" maxlength="1000" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                        <label for="customTags" th:text="#{label.customTags}">Custom Tags (comma-separated)</label>
+                        <input id="customTags" type="text" th:field="*{customTags}" th:placeholder="#{placeholder.customTags}" maxlength="1000" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                     </div>
                     <div>
-                        <label for="customCategories">Custom Categories (comma-separated)</label>
-                        <input id="customCategories" type="text" th:field="*{customCategories}" placeholder="classics, must-read" maxlength="1000" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                        <label for="customCategories" th:text="#{label.customCategories}">Custom Categories (comma-separated)</label>
+                        <input id="customCategories" type="text" th:field="*{customCategories}" th:placeholder="#{placeholder.customCategories}" maxlength="1000" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                     </div>
                 </div>
                 <div class="actions">
-                    <button type="submit" class="btn-primary">Add Book</button>
-                    <button type="reset" class="btn-muted">Clear</button>
+                    <button type="submit" class="btn-primary" th:text="#{button.addBook}">Add Book</button>
+                    <button type="reset" class="btn-muted" th:text="#{button.clear}">Clear</button>
                 </div>
             </form>
             <datalist id="genre-options">
@@ -301,32 +324,32 @@
             </datalist>
         </section>
 
-        <section class="card">
-            <h2>Wishlists</h2>
+        <section class="card" sec:authorize="hasRole('ADMIN')">
+            <h2 th:text="#{section.wishlists}">Wishlists</h2>
 
             <div class="wishlist-block">
-                <label for="wishlistAction">Wishlist Action</label>
+                <label for="wishlistAction" th:text="#{label.wishlistAction}">Wishlist Action</label>
                 <select id="wishlistAction">
-                    <option value="create">Create Wishlist</option>
-                    <option value="active" th:disabled="${#lists.isEmpty(wishlists)}">Active Wishlist</option>
-                    <option value="rename" th:disabled="${activeWishlist == null}">Rename Active Wishlist</option>
+                    <option value="create" th:text="#{option.wishlistAction.create}">Create Wishlist</option>
+                    <option value="active" th:disabled="${#lists.isEmpty(wishlists)}" th:text="#{option.wishlistAction.active}">Active Wishlist</option>
+                    <option value="rename" th:disabled="${activeWishlist == null}" th:text="#{option.wishlistAction.rename}">Rename Active Wishlist</option>
                 </select>
 
                 <div id="wishlist-panel-create" class="wishlist-action-panel active">
                     <form th:action="@{/wishlists}" th:object="${newWishlistForm}" method="post">
-                        <label for="newWishlistName">Create Wishlist</label>
-                        <input id="newWishlistName" type="text" th:field="*{name}" placeholder="Wishlist name" required maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                        <label for="newWishlistName" th:text="#{label.createWishlist}">Create Wishlist</label>
+                        <input id="newWishlistName" type="text" th:field="*{name}" th:placeholder="#{placeholder.wishlistName}" required maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                         <div class="actions">
-                            <button type="submit" class="btn-primary">Create</button>
+                            <button type="submit" class="btn-primary" th:text="#{button.create}">Create</button>
                         </div>
                     </form>
                 </div>
 
                 <div id="wishlist-panel-active" class="wishlist-action-panel">
                     <form th:action="@{/books}" method="get">
-                        <label for="activeWishlistSelect">Active Wishlist</label>
+                        <label for="activeWishlistSelect" th:text="#{label.activeWishlist}">Active Wishlist</label>
                         <select id="activeWishlistSelect" name="wishlistId" onchange="this.form.submit()" th:disabled="${#lists.isEmpty(wishlists)}">
-                            <option th:if="${#lists.isEmpty(wishlists)}" value="">No wishlists available</option>
+                            <option th:if="${#lists.isEmpty(wishlists)}" value="" th:text="#{option.noWishlists}">No wishlists available</option>
                             <option th:each="wishlist : ${wishlists}"
                                     th:value="${wishlist.id}"
                                     th:text="${wishlist.name}"
@@ -339,18 +362,18 @@
                 <div id="wishlist-panel-rename" class="wishlist-action-panel">
                     <div th:if="${activeWishlist != null}">
                         <form th:action="@{|/wishlists/${activeWishlist.id}/rename|}" th:object="${renameWishlistForm}" method="post">
-                            <label for="renameWishlistName">Rename Active Wishlist</label>
-                            <input id="renameWishlistName" type="text" th:field="*{name}" required maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                            <label for="renameWishlistName" th:text="#{label.renameActiveWishlist}">Rename Active Wishlist</label>
+                            <input id="renameWishlistName" type="text" th:field="*{name}" required maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                             <div class="actions">
-                                <button type="submit" class="btn-primary">Rename</button>
+                                <button type="submit" class="btn-primary" th:text="#{button.rename}">Rename</button>
                             </div>
                         </form>
                         <form th:action="@{|/wishlists/${activeWishlist.id}/delete|}" method="post" class="actions">
-                            <button type="submit" class="btn-danger">Delete Wishlist</button>
+                            <button type="submit" class="btn-danger" th:text="#{button.deleteWishlist}">Delete Wishlist</button>
                         </form>
                     </div>
                     <div th:if="${activeWishlist == null}" class="empty">
-                        No active wishlist available.
+                        <span th:text="#{text.noActiveWishlist}">No active wishlist available.</span>
                     </div>
                 </div>
             </div>
@@ -358,17 +381,17 @@
             <div th:if="${activeWishlist != null}" class="wishlist-block">
                 <h3 th:text="${activeWishlist.name}"></h3>
                 <form th:action="@{|/wishlists/${activeWishlist.id}/items|}" th:object="${newWishlistItemForm}" method="post">
-                    <label for="wishlistBookName">Book Name (English)</label>
-                    <input id="wishlistBookName" type="text" th:field="*{bookNameEn}" required maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
-                    <label for="wishlistAuthorName">Author Name (English)</label>
-                    <input id="wishlistAuthorName" type="text" th:field="*{authorNameEn}" required maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                    <label for="wishlistBookName" th:text="#{label.wishlistBookName}">Book Name (English)</label>
+                    <input id="wishlistBookName" type="text" th:field="*{bookNameEn}" required maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
+                    <label for="wishlistAuthorName" th:text="#{label.wishlistAuthorName}">Author Name (English)</label>
+                    <input id="wishlistAuthorName" type="text" th:field="*{authorNameEn}" required maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                     <div class="actions">
-                        <button type="submit" class="btn-primary">Add Item</button>
+                        <button type="submit" class="btn-primary" th:text="#{button.addItem}">Add Item</button>
                     </div>
                 </form>
 
                 <div th:if="${#lists.isEmpty(activeWishlist.items)}" class="empty">
-                    No items in this wishlist.
+                    <span th:text="#{text.noItemsInWishlist}">No items in this wishlist.</span>
                 </div>
 
                 <div th:if="${!#lists.isEmpty(activeWishlist.items)}">
@@ -376,127 +399,131 @@
                         <div><strong th:text="${item.bookNameEn}"></strong></div>
                         <div th:text="${item.authorNameEn}"></div>
                         <form th:action="@{|/wishlists/${activeWishlist.id}/items/${item.id}/delete|}" method="post" class="actions">
-                            <button type="submit" class="btn-danger">Delete Item</button>
+                            <button type="submit" class="btn-danger" th:text="#{button.deleteItem}">Delete Item</button>
                         </form>
                     </div>
                 </div>
             </div>
 
             <div th:if="${activeWishlist == null}" class="empty">
-                No wishlists available.
+                <span th:text="#{text.noWishlistsAvailable}">No wishlists available.</span>
             </div>
+        </section>
+        <section class="card" sec:authorize="isAnonymous()">
+            <h2 th:text="#{section.readOnly}">Read-Only Mode</h2>
+            <p class="empty" th:text="#{readonly.description}">Log in with an authorized account to add, edit, delete books, and manage wishlists.</p>
         </section>
     </div>
 
     <section class="card">
-        <h2>Catalog</h2>
+        <h2 th:text="#{section.catalog}">Catalog</h2>
         <form th:action="@{/books}" th:object="${criteria}" method="get">
             <input type="hidden" name="wishlistId" th:value="${activeWishlistId}">
             <div class="grid-3">
                 <div>
-                    <label for="query">Search (all fields)</label>
-                    <input id="query" type="text" th:field="*{query}" placeholder="Book, author, genre, tags" maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                    <label for="query" th:text="#{label.searchAll}">Search (all fields)</label>
+                    <input id="query" type="text" th:field="*{query}" th:placeholder="#{placeholder.search}" maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                 </div>
                 <div>
-                    <label for="criteriaReadingStatus">Reading Status</label>
+                    <label for="criteriaReadingStatus" th:text="#{label.readingStatus}">Reading Status</label>
                     <select id="criteriaReadingStatus" th:field="*{readingStatus}">
-                        <option value="">All</option>
+                        <option value="" th:text="#{option.readingStatus.all}">All</option>
                         <option th:each="status : ${readingStatuses}" th:value="${status}" th:text="${status}"></option>
                     </select>
                 </div>
                 <div>
-                    <label for="minRating">Minimum Rating</label>
+                    <label for="minRating" th:text="#{label.minimumRating}">Minimum Rating</label>
                     <select id="minRating" th:field="*{minRating}">
-                        <option value="">Any</option>
-                        <option value="1">1+</option>
-                        <option value="2">2+</option>
-                        <option value="3">3+</option>
-                        <option value="4">4+</option>
-                        <option value="5">5</option>
+                        <option value="" th:text="#{option.minRating.any}">Any</option>
+                        <option value="1" th:text="#{option.minRating.1}">1+</option>
+                        <option value="2" th:text="#{option.minRating.2}">2+</option>
+                        <option value="3" th:text="#{option.minRating.3}">3+</option>
+                        <option value="4" th:text="#{option.minRating.4}">4+</option>
+                        <option value="5" th:text="#{option.minRating.5}">5</option>
                     </select>
                 </div>
                 <div>
-                    <label for="criteriaGenre">Genre</label>
-                    <input id="criteriaGenre" type="text" list="genre-options" th:field="*{genre}" placeholder="Fiction" maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                    <label for="criteriaGenre" th:text="#{label.genre}">Genre</label>
+                    <input id="criteriaGenre" type="text" list="genre-options" th:field="*{genre}" th:placeholder="#{placeholder.genre}" maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                 </div>
                 <div>
-                    <label for="criteriaLanguage">Book Language</label>
-                    <input id="criteriaLanguage" type="text" list="language-options" th:field="*{bookLanguage}" placeholder="English" maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                    <label for="criteriaLanguage" th:text="#{label.bookLanguage}">Book Language</label>
+                    <input id="criteriaLanguage" type="text" list="language-options" th:field="*{bookLanguage}" th:placeholder="#{placeholder.bookLanguage}" maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                 </div>
                 <div>
-                    <label for="criteriaTags">Tags (comma-separated)</label>
-                    <input id="criteriaTags" type="text" th:field="*{tags}" placeholder="science fiction, memoir" maxlength="500" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                    <label for="criteriaTags" th:text="#{label.tags}">Tags (comma-separated)</label>
+                    <input id="criteriaTags" type="text" th:field="*{tags}" th:placeholder="#{placeholder.criteriaTags}" maxlength="500" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                 </div>
                 <div>
-                    <label for="criteriaCategories">Categories (comma-separated)</label>
-                    <input id="criteriaCategories" type="text" th:field="*{categories}" placeholder="favorites, classics" maxlength="500" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                    <label for="criteriaCategories" th:text="#{label.categories}">Categories (comma-separated)</label>
+                    <input id="criteriaCategories" type="text" th:field="*{categories}" th:placeholder="#{placeholder.criteriaCategories}" maxlength="500" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                 </div>
                 <div>
-                    <label for="sortBy">Sort By</label>
+                    <label for="sortBy" th:text="#{label.sortBy}">Sort By</label>
                     <select id="sortBy" th:field="*{sortBy}">
-                        <option value="id">Recently Added</option>
-                        <option value="authorName">Author Name</option>
-                        <option value="bookName">Book Name</option>
-                        <option value="readingStatus">Reading Status</option>
-                        <option value="rating">Rating</option>
-                        <option value="genre">Genre</option>
+                        <option value="id" th:text="#{option.sortBy.id}">Recently Added</option>
+                        <option value="authorName" th:text="#{option.sortBy.authorName}">Author Name</option>
+                        <option value="bookName" th:text="#{option.sortBy.bookName}">Book Name</option>
+                        <option value="readingStatus" th:text="#{option.sortBy.readingStatus}">Reading Status</option>
+                        <option value="rating" th:text="#{option.sortBy.rating}">Rating</option>
+                        <option value="genre" th:text="#{option.sortBy.genre}">Genre</option>
                     </select>
                 </div>
                 <div>
-                    <label for="sortDir">Sort Direction</label>
+                    <label for="sortDir" th:text="#{label.sortDirection}">Sort Direction</label>
                     <select id="sortDir" th:field="*{sortDir}">
-                        <option value="desc">Descending</option>
-                        <option value="asc">Ascending</option>
+                        <option value="desc" th:text="#{option.sortDir.desc}">Descending</option>
+                        <option value="asc" th:text="#{option.sortDir.asc}">Ascending</option>
                     </select>
                 </div>
             </div>
             <div class="actions">
-                <button type="submit" class="btn-primary">Apply</button>
-                <a th:href="@{/books}" class="btn-link btn-muted">Clear</a>
+                <button type="submit" class="btn-primary" th:text="#{button.apply}">Apply</button>
+                <a th:href="@{/books}" class="btn-link btn-muted" th:text="#{button.clear}">Clear</a>
             </div>
         </form>
-        <p class="empty">Showing <span th:text="${#lists.size(books)}"></span> of <span th:text="${totalResults}"></span> result(s)</p>
-        <p class="empty" th:if="${#lists.isEmpty(books)}">No books found for current criteria.</p>
+        <p class="empty"><span th:text="#{text.showing}">Showing</span> <span th:text="${#lists.size(books)}"></span> <span th:text="#{text.of}">of</span> <span th:text="${totalResults}"></span> <span th:text="#{text.results}">result(s)</span></p>
+        <p class="empty" th:if="${#lists.isEmpty(books)}" th:text="#{text.noBooksFound}">No books found for current criteria.</p>
 
         <table th:if="${!#lists.isEmpty(books)}">
             <thead>
             <tr>
-                <th>ID</th>
-                <th>Details</th>
-                <th>Actions</th>
+                <th th:text="#{table.id}">ID</th>
+                <th th:text="#{table.details}">Details</th>
+                <th th:text="#{table.actions}">Actions</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="book : ${books}">
                 <td th:text="${book.id}"></td>
                 <td>
-                    <form class="row-form" th:action="@{|/books/${book.id}/update|}" method="post">
+                    <form class="row-form" th:action="@{|/books/${book.id}/update|}" method="post" sec:authorize="hasRole('ADMIN')">
                         <div>
-                            <label>Book Name (English) *</label>
-                            <input name="bookNameEn" type="text" required th:value="${book.bookNameEn}" maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                            <label th:text="#{label.bookNameEn}">Book Name (English) *</label>
+                            <input name="bookNameEn" type="text" required th:value="${book.bookNameEn}" maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                         </div>
                         <div>
-                            <label>Book Name (Marathi)</label>
-                            <input name="bookNameMr" type="text" th:value="${book.bookNameMr}" maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                            <label th:text="#{label.bookNameMr}">Book Name (Marathi)</label>
+                            <input name="bookNameMr" type="text" th:value="${book.bookNameMr}" maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                         </div>
                         <div>
-                            <label>Author Name (English) *</label>
-                            <input name="authorNameEn" type="text" required th:value="${book.authorNameEn}" maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                            <label th:text="#{label.authorNameEn}">Author Name (English) *</label>
+                            <input name="authorNameEn" type="text" required th:value="${book.authorNameEn}" maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                         </div>
                         <div>
-                            <label>Author Name (Marathi)</label>
-                            <input name="authorNameMr" type="text" th:value="${book.authorNameMr}" maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                            <label th:text="#{label.authorNameMr}">Author Name (Marathi)</label>
+                            <input name="authorNameMr" type="text" th:value="${book.authorNameMr}" maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                         </div>
                         <div>
-                            <label>Reading Status</label>
+                            <label th:text="#{label.readingStatus}">Reading Status</label>
                             <select name="readingStatus">
                                 <option th:each="status : ${readingStatuses}" th:value="${status}" th:text="${status}" th:selected="${book.readingStatus == status}"></option>
                             </select>
                         </div>
                         <div>
-                            <label>Rating (1-5)</label>
+                            <label th:text="#{label.rating}">Rating (1-5)</label>
                             <select name="rating">
-                                <option value="" th:selected="${book.rating == null}">Not rated</option>
+                                <option value="" th:selected="${book.rating == null}" th:text="#{option.notRated}">Not rated</option>
                                 <option value="1" th:selected="${book.rating == 1}">1</option>
                                 <option value="2" th:selected="${book.rating == 2}">2</option>
                                 <option value="3" th:selected="${book.rating == 3}">3</option>
@@ -505,34 +532,48 @@
                             </select>
                         </div>
                         <div>
-                            <label>Genre</label>
-                            <input name="genre" type="text" list="genre-options" th:value="${book.genre}" maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                            <label th:text="#{label.genre}">Genre</label>
+                            <input name="genre" type="text" list="genre-options" th:value="${book.genre}" maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                         </div>
                         <div>
-                            <label>Book Language</label>
-                            <input name="bookLanguage" type="text" list="language-options" th:value="${book.bookLanguage}" maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                            <label th:text="#{label.bookLanguage}">Book Language</label>
+                            <input name="bookLanguage" type="text" list="language-options" th:value="${book.bookLanguage}" maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                         </div>
                         <div>
-                            <label>Location</label>
-                            <input name="location" type="text" th:value="${book.location}" maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                            <label th:text="#{label.location}">Location</label>
+                            <input name="location" type="text" th:value="${book.location}" maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                         </div>
                         <div>
-                            <label>Custom Tags</label>
-                            <input name="customTags" type="text" th:value="${book.customTags}" maxlength="1000" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                            <label th:text="#{label.customTags}">Custom Tags</label>
+                            <input name="customTags" type="text" th:value="${book.customTags}" maxlength="1000" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                         </div>
                         <div>
-                            <label>Custom Categories</label>
-                            <input name="customCategories" type="text" th:value="${book.customCategories}" maxlength="1000" pattern="[^<>]*" title="Angle brackets are not allowed.">
+                            <label th:text="#{label.customCategories}">Custom Categories</label>
+                            <input name="customCategories" type="text" th:value="${book.customCategories}" maxlength="1000" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                         </div>
                         <div class="actions">
-                            <button type="submit" class="btn-primary">Update</button>
+                            <button type="submit" class="btn-primary" th:text="#{button.update}">Update</button>
                         </div>
                     </form>
+                    <div sec:authorize="isAnonymous()">
+                        <div><strong th:text="${book.bookNameEn}"></strong></div>
+                        <div th:if="${book.bookNameMr}" th:text="${book.bookNameMr}"></div>
+                        <div th:text="${book.authorNameEn}"></div>
+                        <div th:if="${book.authorNameMr}" th:text="${book.authorNameMr}"></div>
+                        <div><span th:text="#{text.status}">Status</span>: <span th:text="${book.readingStatus}"></span></div>
+                        <div th:if="${book.rating != null}"><span th:text="#{text.rating}">Rating</span>: <span th:text="${book.rating}"></span></div>
+                        <div><span th:text="#{label.genre}">Genre</span>: <span th:text="${book.genre}"></span></div>
+                        <div><span th:text="#{text.language}">Language</span>: <span th:text="${book.bookLanguage}"></span></div>
+                        <div><span th:text="#{label.location}">Location</span>: <span th:text="${book.location}"></span></div>
+                        <div th:if="${book.customTags}"><span th:text="#{text.tags}">Tags</span>: <span th:text="${book.customTags}"></span></div>
+                        <div th:if="${book.customCategories}"><span th:text="#{text.categories}">Categories</span>: <span th:text="${book.customCategories}"></span></div>
+                    </div>
                 </td>
                 <td>
-                    <form th:action="@{|/books/${book.id}/delete|}" method="post">
-                        <button type="submit" class="btn-danger">Delete</button>
+                    <form th:action="@{|/books/${book.id}/delete|}" method="post" sec:authorize="hasRole('ADMIN')">
+                        <button type="submit" class="btn-danger" th:text="#{button.delete}">Delete</button>
                     </form>
+                    <span class="empty" sec:authorize="isAnonymous()" th:text="#{text.viewOnly}">View only</span>
                 </td>
             </tr>
             </tbody>
@@ -554,7 +595,7 @@
                     sortBy=${criteria.sortBy},
                     sortDir=${criteria.sortDir}
                )}">
-                Previous
+                <span th:text="#{pagination.previous}">Previous</span>
             </a>
 
             <a th:each="pageNumber : ${#numbers.sequence(1, totalPages)}"
@@ -591,7 +632,7 @@
                     sortBy=${criteria.sortBy},
                     sortDir=${criteria.sortDir}
                )}">
-                Next
+                <span th:text="#{pagination.next}">Next</span>
             </a>
         </div>
     </section>
@@ -599,6 +640,9 @@
 <script>
     (function () {
         const actionSelect = document.getElementById("wishlistAction");
+        if (!actionSelect) {
+            return;
+        }
         const panels = {
             create: document.getElementById("wishlist-panel-create"),
             active: document.getElementById("wishlist-panel-active"),

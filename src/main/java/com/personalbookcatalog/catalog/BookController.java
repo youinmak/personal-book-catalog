@@ -2,12 +2,13 @@ package com.personalbookcatalog.catalog;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Locale;
 
 import jakarta.validation.Valid;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,13 +28,15 @@ public class BookController {
 
     private final BookService bookService;
     private final WishlistService wishlistService;
+    private final MessageSource messageSource;
 
     /**
      * Creates controller with service dependencies.
      */
-    public BookController(BookService bookService, WishlistService wishlistService) {
+    public BookController(BookService bookService, WishlistService wishlistService, MessageSource messageSource) {
         this.bookService = bookService;
         this.wishlistService = wishlistService;
+        this.messageSource = messageSource;
     }
 
     /**
@@ -45,11 +48,16 @@ public class BookController {
             BindingResult criteriaBindingResult,
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "wishlistId", required = false) Long wishlistId,
+            @RequestParam(name = "denied", defaultValue = "false") boolean denied,
+            Locale locale,
             Model model) {
         if (criteriaBindingResult.hasErrors()) {
-            model.addAttribute("errorMessage", "Invalid filter input was ignored.");
+            model.addAttribute("errorMessage", message("message.filter.invalid", locale));
             criteria = new BookListCriteria();
             model.addAttribute("criteria", criteria);
+        }
+        if (denied) {
+            model.addAttribute("errorMessage", message("message.auth.denied", locale));
         }
         List<Book> filteredBooks = bookService.findAll(criteria);
         int totalResults = filteredBooks.size();
@@ -85,6 +93,7 @@ public class BookController {
     public String createBook(
             @Valid @ModelAttribute("newBookForm") BookForm form,
             BindingResult bindingResult,
+            Locale locale,
             RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errorMessage", firstValidationMessage(bindingResult));
@@ -93,7 +102,7 @@ public class BookController {
         }
         try {
             bookService.create(form);
-            redirectAttributes.addFlashAttribute("successMessage", "Book added successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", message("message.book.add.success", locale));
         } catch (IllegalArgumentException exception) {
             redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
             redirectAttributes.addFlashAttribute("newBookForm", form);
@@ -109,6 +118,7 @@ public class BookController {
             @PathVariable Long id,
             @Valid @ModelAttribute BookForm form,
             BindingResult bindingResult,
+            Locale locale,
             RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errorMessage", firstValidationMessage(bindingResult));
@@ -116,7 +126,7 @@ public class BookController {
         }
         try {
             bookService.update(id, form);
-            redirectAttributes.addFlashAttribute("successMessage", "Book updated successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", message("message.book.update.success", locale));
         } catch (NoSuchElementException | IllegalArgumentException exception) {
             redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
         }
@@ -127,10 +137,10 @@ public class BookController {
      * Deletes a book and redirects back to list page.
      */
     @PostMapping("/books/{id}/delete")
-    public String deleteBook(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deleteBook(@PathVariable Long id, Locale locale, RedirectAttributes redirectAttributes) {
         try {
             bookService.delete(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Book deleted successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", message("message.book.delete.success", locale));
         } catch (NoSuchElementException exception) {
             redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
         }
@@ -144,6 +154,7 @@ public class BookController {
     public String createWishlist(
             @Valid @ModelAttribute WishlistForm form,
             BindingResult bindingResult,
+            Locale locale,
             RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errorMessage", firstValidationMessage(bindingResult));
@@ -151,7 +162,7 @@ public class BookController {
         }
         try {
             Wishlist wishlist = wishlistService.createWishlist(form.getName());
-            redirectAttributes.addFlashAttribute("successMessage", "Wishlist created successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", message("message.wishlist.create.success", locale));
             return redirectToBooks(wishlist.getId());
         } catch (IllegalArgumentException exception) {
             redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
@@ -167,6 +178,7 @@ public class BookController {
             @PathVariable Long id,
             @Valid @ModelAttribute WishlistRenameForm form,
             BindingResult bindingResult,
+            Locale locale,
             RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errorMessage", firstValidationMessage(bindingResult));
@@ -174,7 +186,7 @@ public class BookController {
         }
         try {
             wishlistService.renameWishlist(id, form.getName());
-            redirectAttributes.addFlashAttribute("successMessage", "Wishlist renamed successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", message("message.wishlist.rename.success", locale));
         } catch (NoSuchElementException | IllegalArgumentException exception) {
             redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
         }
@@ -185,10 +197,10 @@ public class BookController {
      * Deletes wishlist and redirects to next active wishlist if available.
      */
     @PostMapping("/wishlists/{id}/delete")
-    public String deleteWishlist(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deleteWishlist(@PathVariable Long id, Locale locale, RedirectAttributes redirectAttributes) {
         try {
             Long nextActiveId = wishlistService.deleteWishlist(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Wishlist deleted successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", message("message.wishlist.delete.success", locale));
             return redirectToBooks(nextActiveId);
         } catch (NoSuchElementException exception) {
             redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
@@ -204,6 +216,7 @@ public class BookController {
             @PathVariable Long id,
             @Valid @ModelAttribute WishlistItemForm form,
             BindingResult bindingResult,
+            Locale locale,
             RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errorMessage", firstValidationMessage(bindingResult));
@@ -211,7 +224,7 @@ public class BookController {
         }
         try {
             wishlistService.addItem(id, form.getBookNameEn(), form.getAuthorNameEn());
-            redirectAttributes.addFlashAttribute("successMessage", "Wishlist item added successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", message("message.wishlist.item.add.success", locale));
         } catch (NoSuchElementException | IllegalArgumentException exception) {
             redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
         }
@@ -225,10 +238,11 @@ public class BookController {
     public String deleteWishlistItem(
             @PathVariable Long wishlistId,
             @PathVariable Long itemId,
+            Locale locale,
             RedirectAttributes redirectAttributes) {
         try {
             wishlistService.deleteItem(wishlistId, itemId);
-            redirectAttributes.addFlashAttribute("successMessage", "Wishlist item deleted successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", message("message.wishlist.item.delete.success", locale));
         } catch (NoSuchElementException exception) {
             redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
         }
@@ -282,5 +296,9 @@ public class BookController {
             return bindingResult.getGlobalErrors().getFirst().getDefaultMessage();
         }
         return "Invalid input.";
+    }
+
+    private String message(String key, Locale locale) {
+        return messageSource.getMessage(key, null, locale);
     }
 }
