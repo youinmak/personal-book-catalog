@@ -236,19 +236,19 @@
                 <div class="grid">
                     <div>
                         <label for="bookNameEn">Book Name (English) *</label>
-                        <input id="bookNameEn" type="text" th:field="*{bookNameEn}" required>
+                        <input id="bookNameEn" type="text" th:field="*{bookNameEn}" required maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
                     </div>
                     <div>
                         <label for="bookNameMr">Book Name (Marathi)</label>
-                        <input id="bookNameMr" type="text" th:field="*{bookNameMr}">
+                        <input id="bookNameMr" type="text" th:field="*{bookNameMr}" maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
                     </div>
                     <div>
                         <label for="authorNameEn">Author Name (English) *</label>
-                        <input id="authorNameEn" type="text" th:field="*{authorNameEn}" required>
+                        <input id="authorNameEn" type="text" th:field="*{authorNameEn}" required maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
                     </div>
                     <div>
                         <label for="authorNameMr">Author Name (Marathi)</label>
-                        <input id="authorNameMr" type="text" th:field="*{authorNameMr}">
+                        <input id="authorNameMr" type="text" th:field="*{authorNameMr}" maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
                     </div>
                     <div>
                         <label for="readingStatus">Reading Status</label>
@@ -269,23 +269,23 @@
                     </div>
                     <div>
                         <label for="genre">Genre</label>
-                        <input id="genre" type="text" list="genre-options" th:field="*{genre}" placeholder="Fiction">
+                        <input id="genre" type="text" list="genre-options" th:field="*{genre}" placeholder="Fiction" maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
                     </div>
                     <div>
                         <label for="bookLanguage">Book Language</label>
-                        <input id="bookLanguage" type="text" list="language-options" th:field="*{bookLanguage}" placeholder="English">
+                        <input id="bookLanguage" type="text" list="language-options" th:field="*{bookLanguage}" placeholder="English" maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
                     </div>
                     <div>
                         <label for="location">Location</label>
-                        <input id="location" type="text" th:field="*{location}" placeholder="Asad">
+                        <input id="location" type="text" th:field="*{location}" placeholder="Asad" maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
                     </div>
                     <div>
                         <label for="customTags">Custom Tags (comma-separated)</label>
-                        <input id="customTags" type="text" th:field="*{customTags}" placeholder="dalit literature, memoir">
+                        <input id="customTags" type="text" th:field="*{customTags}" placeholder="dalit literature, memoir" maxlength="1000" pattern="[^<>]*" title="Angle brackets are not allowed.">
                     </div>
                     <div>
                         <label for="customCategories">Custom Categories (comma-separated)</label>
-                        <input id="customCategories" type="text" th:field="*{customCategories}" placeholder="classics, must-read">
+                        <input id="customCategories" type="text" th:field="*{customCategories}" placeholder="classics, must-read" maxlength="1000" pattern="[^<>]*" title="Angle brackets are not allowed.">
                     </div>
                 </div>
                 <div class="actions">
@@ -315,7 +315,7 @@
                 <div id="wishlist-panel-create" class="wishlist-action-panel active">
                     <form th:action="@{/wishlists}" th:object="${newWishlistForm}" method="post">
                         <label for="newWishlistName">Create Wishlist</label>
-                        <input id="newWishlistName" type="text" th:field="*{name}" placeholder="Wishlist name" required>
+                        <input id="newWishlistName" type="text" th:field="*{name}" placeholder="Wishlist name" required maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
                         <div class="actions">
                             <button type="submit" class="btn-primary">Create</button>
                         </div>
@@ -340,7 +340,7 @@
                     <div th:if="${activeWishlist != null}">
                         <form th:action="@{|/wishlists/${activeWishlist.id}/rename|}" th:object="${renameWishlistForm}" method="post">
                             <label for="renameWishlistName">Rename Active Wishlist</label>
-                            <input id="renameWishlistName" type="text" th:field="*{name}" required>
+                            <input id="renameWishlistName" type="text" th:field="*{name}" required maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
                             <div class="actions">
                                 <button type="submit" class="btn-primary">Rename</button>
                             </div>
@@ -359,9 +359,9 @@
                 <h3 th:text="${activeWishlist.name}"></h3>
                 <form th:action="@{|/wishlists/${activeWishlist.id}/items|}" th:object="${newWishlistItemForm}" method="post">
                     <label for="wishlistBookName">Book Name (English)</label>
-                    <input id="wishlistBookName" type="text" th:field="*{bookNameEn}" required>
+                    <input id="wishlistBookName" type="text" th:field="*{bookNameEn}" required maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
                     <label for="wishlistAuthorName">Author Name (English)</label>
-                    <input id="wishlistAuthorName" type="text" th:field="*{authorNameEn}" required>
+                    <input id="wishlistAuthorName" type="text" th:field="*{authorNameEn}" required maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
                     <div class="actions">
                         <button type="submit" class="btn-primary">Add Item</button>
                     </div>
@@ -395,7 +395,7 @@
             <div class="grid-3">
                 <div>
                     <label for="query">Search (all fields)</label>
-                    <input id="query" type="text" th:field="*{query}" placeholder="Book, author, genre, tags">
+                    <input id="query" type="text" th:field="*{query}" placeholder="Book, author, genre, tags" maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
                 </div>
                 <div>
                     <label for="criteriaReadingStatus">Reading Status</label>
@@ -417,19 +417,19 @@
                 </div>
                 <div>
                     <label for="criteriaGenre">Genre</label>
-                    <input id="criteriaGenre" type="text" list="genre-options" th:field="*{genre}" placeholder="Fiction">
+                    <input id="criteriaGenre" type="text" list="genre-options" th:field="*{genre}" placeholder="Fiction" maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
                 </div>
                 <div>
                     <label for="criteriaLanguage">Book Language</label>
-                    <input id="criteriaLanguage" type="text" list="language-options" th:field="*{bookLanguage}" placeholder="English">
+                    <input id="criteriaLanguage" type="text" list="language-options" th:field="*{bookLanguage}" placeholder="English" maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
                 </div>
                 <div>
                     <label for="criteriaTags">Tags (comma-separated)</label>
-                    <input id="criteriaTags" type="text" th:field="*{tags}" placeholder="science fiction, memoir">
+                    <input id="criteriaTags" type="text" th:field="*{tags}" placeholder="science fiction, memoir" maxlength="500" pattern="[^<>]*" title="Angle brackets are not allowed.">
                 </div>
                 <div>
                     <label for="criteriaCategories">Categories (comma-separated)</label>
-                    <input id="criteriaCategories" type="text" th:field="*{categories}" placeholder="favorites, classics">
+                    <input id="criteriaCategories" type="text" th:field="*{categories}" placeholder="favorites, classics" maxlength="500" pattern="[^<>]*" title="Angle brackets are not allowed.">
                 </div>
                 <div>
                     <label for="sortBy">Sort By</label>
@@ -473,19 +473,19 @@
                     <form class="row-form" th:action="@{|/books/${book.id}/update|}" method="post">
                         <div>
                             <label>Book Name (English) *</label>
-                            <input name="bookNameEn" type="text" required th:value="${book.bookNameEn}">
+                            <input name="bookNameEn" type="text" required th:value="${book.bookNameEn}" maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
                         </div>
                         <div>
                             <label>Book Name (Marathi)</label>
-                            <input name="bookNameMr" type="text" th:value="${book.bookNameMr}">
+                            <input name="bookNameMr" type="text" th:value="${book.bookNameMr}" maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
                         </div>
                         <div>
                             <label>Author Name (English) *</label>
-                            <input name="authorNameEn" type="text" required th:value="${book.authorNameEn}">
+                            <input name="authorNameEn" type="text" required th:value="${book.authorNameEn}" maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
                         </div>
                         <div>
                             <label>Author Name (Marathi)</label>
-                            <input name="authorNameMr" type="text" th:value="${book.authorNameMr}">
+                            <input name="authorNameMr" type="text" th:value="${book.authorNameMr}" maxlength="300" pattern="[^<>]*" title="Angle brackets are not allowed.">
                         </div>
                         <div>
                             <label>Reading Status</label>
@@ -506,23 +506,23 @@
                         </div>
                         <div>
                             <label>Genre</label>
-                            <input name="genre" type="text" list="genre-options" th:value="${book.genre}">
+                            <input name="genre" type="text" list="genre-options" th:value="${book.genre}" maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
                         </div>
                         <div>
                             <label>Book Language</label>
-                            <input name="bookLanguage" type="text" list="language-options" th:value="${book.bookLanguage}">
+                            <input name="bookLanguage" type="text" list="language-options" th:value="${book.bookLanguage}" maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
                         </div>
                         <div>
                             <label>Location</label>
-                            <input name="location" type="text" th:value="${book.location}">
+                            <input name="location" type="text" th:value="${book.location}" maxlength="120" pattern="[^<>]*" title="Angle brackets are not allowed.">
                         </div>
                         <div>
                             <label>Custom Tags</label>
-                            <input name="customTags" type="text" th:value="${book.customTags}">
+                            <input name="customTags" type="text" th:value="${book.customTags}" maxlength="1000" pattern="[^<>]*" title="Angle brackets are not allowed.">
                         </div>
                         <div>
                             <label>Custom Categories</label>
-                            <input name="customCategories" type="text" th:value="${book.customCategories}">
+                            <input name="customCategories" type="text" th:value="${book.customCategories}" maxlength="1000" pattern="[^<>]*" title="Angle brackets are not allowed.">
                         </div>
                         <div class="actions">
                             <button type="submit" class="btn-primary">Update</button>

@@ -3,6 +3,7 @@ package com.personalbookcatalog.catalog;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 /**
@@ -10,20 +11,26 @@ import jakarta.validation.constraints.Size;
  */
 public class BookForm {
 
+    private static final String NO_ANGLE_BRACKETS = "^[^<>]*$";
+
     private Long id;
 
     @NotBlank(message = "Book name (English) is required.")
     @Size(max = 300, message = "Book name (English) must be at most 300 characters.")
+    @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Book name (English) contains unsafe characters.")
     private String bookNameEn;
 
     @Size(max = 300, message = "Book name (Marathi) must be at most 300 characters.")
+    @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Book name (Marathi) contains unsafe characters.")
     private String bookNameMr;
 
     @NotBlank(message = "Author name (English) is required.")
     @Size(max = 300, message = "Author name (English) must be at most 300 characters.")
+    @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Author name (English) contains unsafe characters.")
     private String authorNameEn;
 
     @Size(max = 300, message = "Author name (Marathi) must be at most 300 characters.")
+    @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Author name (Marathi) contains unsafe characters.")
     private String authorNameMr;
 
     private ReadingStatus readingStatus;
@@ -33,18 +40,23 @@ public class BookForm {
     private Integer rating;
 
     @Size(max = 120, message = "Genre must be at most 120 characters.")
+    @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Genre contains unsafe characters.")
     private String genre;
 
     @Size(max = 120, message = "Book language must be at most 120 characters.")
+    @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Book language contains unsafe characters.")
     private String bookLanguage;
 
     @Size(max = 120, message = "Location must be at most 120 characters.")
+    @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Location contains unsafe characters.")
     private String location;
 
     @Size(max = 1000, message = "Custom tags must be at most 1000 characters.")
+    @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Custom tags contain unsafe characters.")
     private String customTags;
 
     @Size(max = 1000, message = "Custom categories must be at most 1000 characters.")
+    @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Custom categories contain unsafe characters.")
     private String customCategories;
 
     /**
