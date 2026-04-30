@@ -11,10 +11,10 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "app.auth.admin")
 public class AuthProperties {
 
-    @NotBlank(message = "app.auth.admin.username is required")
+    @NotBlank(message = "{validation.admin.username.required}")
     private String username;
 
-    @NotBlank(message = "app.auth.admin.password-hash is required")
+    @NotBlank(message = "{validation.admin.password.required}")
     private String passwordHash;
 
     public String getUsername() {
