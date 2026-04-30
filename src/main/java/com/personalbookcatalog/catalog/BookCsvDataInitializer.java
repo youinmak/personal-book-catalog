@@ -102,7 +102,6 @@ public class BookCsvDataInitializer implements ApplicationRunner {
                 book.setBookNameEn(bookNameEn);
                 book.setAuthorNameEn(authorNameEn);
                 book.setReadingStatus(ReadingStatus.FINISHED);
-                book.setGenre("Unknown");
                 book.setBookLanguage("Marathi");
                 book.setLocation("Asad");
                 books.add(book);

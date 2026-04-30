@@ -68,6 +68,8 @@ Important output:
 From repository root:
 
 ```bash
+export APP_AUTH_ADMIN_USERNAME=admin
+export APP_AUTH_ADMIN_PASSWORD_HASH='$2y$10$...'
 chmod +x infra/scripts/deploy.sh
 infra/scripts/deploy.sh <public-ip> <path-to-private-key> [jar-path] [app-port]
 ```
@@ -81,7 +83,7 @@ infra/scripts/deploy.sh 3.91.10.20 ~/.ssh/my-key.pem
 The script will:
 
 - Build JAR if missing
-- Upload JAR and `data/BookList.csv`
+- Upload JAR, `data/BookList.csv`, and runtime auth env (`/opt/personal-book-catalog/app.env`)
 - Restart `personal-book-catalog` systemd service
 
 ## 3) Access app

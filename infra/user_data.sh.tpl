@@ -12,6 +12,13 @@ id -u "$${APP_USER}" >/dev/null 2>&1 || useradd --system --create-home --shell /
 mkdir -p "$${APP_DIR}/data"
 chown -R "$${APP_USER}:$${APP_USER}" "$${APP_DIR}"
 
+cat > "$${APP_DIR}/app.env" <<ENVFILE
+APP_AUTH_ADMIN_USERNAME=
+APP_AUTH_ADMIN_PASSWORD_HASH=
+ENVFILE
+chmod 600 "$${APP_DIR}/app.env"
+chown "$${APP_USER}:$${APP_USER}" "$${APP_DIR}/app.env"
+
 cat > /etc/systemd/system/personal-book-catalog.service <<SERVICE
 [Unit]
 Description=Personal Book Catalog Spring Boot service
@@ -22,6 +29,7 @@ ConditionPathExists=$${APP_DIR}/app.jar
 Type=simple
 User=$${APP_USER}
 WorkingDirectory=$${APP_DIR}
+EnvironmentFile=-$${APP_DIR}/app.env
 ExecStart=/usr/bin/java -jar $${APP_DIR}/app.jar --server.port=${app_port} --spring.datasource.url=jdbc:h2:file:$${APP_DIR}/data/booksdb\;AUTO_SERVER=TRUE --app.bootstrap.book-csv-path=$${APP_DIR}/data/BookList.csv --app.bootstrap.marker-path=$${APP_DIR}/data/.book-bootstrap.done
 Restart=always
 RestartSec=5

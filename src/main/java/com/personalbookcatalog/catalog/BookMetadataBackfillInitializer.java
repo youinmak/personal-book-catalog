@@ -38,10 +38,6 @@ public class BookMetadataBackfillInitializer implements ApplicationRunner {
                 book.setReadingStatus(ReadingStatus.UNREAD);
                 updated = true;
             }
-            if (!hasText(book.getGenre())) {
-                book.setGenre("Unknown");
-                updated = true;
-            }
             if (!hasText(book.getBookLanguage())) {
                 book.setBookLanguage("Unknown");
                 updated = true;

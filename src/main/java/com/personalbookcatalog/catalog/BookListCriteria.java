@@ -1,7 +1,5 @@
 package com.personalbookcatalog.catalog;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -17,28 +15,12 @@ public class BookListCriteria {
     private String query;
     private ReadingStatus readingStatus;
 
-    @Min(value = 1, message = "Minimum rating must be between 1 and 5.")
-    @Max(value = 5, message = "Minimum rating must be between 1 and 5.")
-    private Integer minRating;
-
-    @Size(max = 120, message = "Genre filter must be at most 120 characters.")
-    @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Genre filter contains unsafe characters.")
-    private String genre;
-
     @Size(max = 120, message = "Language filter must be at most 120 characters.")
     @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Language filter contains unsafe characters.")
     private String bookLanguage;
 
-    @Size(max = 500, message = "Tags filter must be at most 500 characters.")
-    @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Tags filter contains unsafe characters.")
-    private String tags;
-
-    @Size(max = 500, message = "Categories filter must be at most 500 characters.")
-    @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Categories filter contains unsafe characters.")
-    private String categories;
-
     @Pattern(
-            regexp = "^(id|authorName|bookName|readingStatus|rating|genre)?$",
+            regexp = "^(id|authorName|bookName|readingStatus)?$",
             message = "Invalid sort field.")
     private String sortBy;
 
@@ -74,34 +56,6 @@ public class BookListCriteria {
     }
 
     /**
-     * Returns minimum allowed rating for list filtering.
-     */
-    public Integer getMinRating() {
-        return minRating;
-    }
-
-    /**
-     * Sets minimum allowed rating for list filtering.
-     */
-    public void setMinRating(Integer minRating) {
-        this.minRating = minRating;
-    }
-
-    /**
-     * Returns requested genre filter.
-     */
-    public String getGenre() {
-        return genre;
-    }
-
-    /**
-     * Sets requested genre filter.
-     */
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
-
-    /**
      * Returns requested book language filter.
      */
     public String getBookLanguage() {
@@ -113,34 +67,6 @@ public class BookListCriteria {
      */
     public void setBookLanguage(String bookLanguage) {
         this.bookLanguage = bookLanguage;
-    }
-
-    /**
-     * Returns comma-separated tags requested for filtering.
-     */
-    public String getTags() {
-        return tags;
-    }
-
-    /**
-     * Sets comma-separated tags requested for filtering.
-     */
-    public void setTags(String tags) {
-        this.tags = tags;
-    }
-
-    /**
-     * Returns comma-separated categories requested for filtering.
-     */
-    public String getCategories() {
-        return categories;
-    }
-
-    /**
-     * Sets comma-separated categories requested for filtering.
-     */
-    public void setCategories(String categories) {
-        this.categories = categories;
     }
 
     /**

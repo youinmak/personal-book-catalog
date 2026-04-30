@@ -1,7 +1,5 @@
 package com.personalbookcatalog.catalog;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -35,14 +33,6 @@ public class BookForm {
 
     private ReadingStatus readingStatus;
 
-    @Min(value = 1, message = "Rating must be between 1 and 5.")
-    @Max(value = 5, message = "Rating must be between 1 and 5.")
-    private Integer rating;
-
-    @Size(max = 120, message = "Genre must be at most 120 characters.")
-    @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Genre contains unsafe characters.")
-    private String genre;
-
     @Size(max = 120, message = "Book language must be at most 120 characters.")
     @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Book language contains unsafe characters.")
     private String bookLanguage;
@@ -50,14 +40,6 @@ public class BookForm {
     @Size(max = 120, message = "Location must be at most 120 characters.")
     @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Location contains unsafe characters.")
     private String location;
-
-    @Size(max = 1000, message = "Custom tags must be at most 1000 characters.")
-    @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Custom tags contain unsafe characters.")
-    private String customTags;
-
-    @Size(max = 1000, message = "Custom categories must be at most 1000 characters.")
-    @Pattern(regexp = NO_ANGLE_BRACKETS, message = "Custom categories contain unsafe characters.")
-    private String customCategories;
 
     /**
      * Returns identifier for update context.
@@ -144,34 +126,6 @@ public class BookForm {
     }
 
     /**
-     * Returns optional rating value.
-     */
-    public Integer getRating() {
-        return rating;
-    }
-
-    /**
-     * Sets optional rating value.
-     */
-    public void setRating(Integer rating) {
-        this.rating = rating;
-    }
-
-    /**
-     * Returns book genre.
-     */
-    public String getGenre() {
-        return genre;
-    }
-
-    /**
-     * Sets book genre.
-     */
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
-
-    /**
      * Returns book language.
      */
     public String getBookLanguage() {
@@ -199,31 +153,4 @@ public class BookForm {
         this.location = location;
     }
 
-    /**
-     * Returns raw tags input.
-     */
-    public String getCustomTags() {
-        return customTags;
-    }
-
-    /**
-     * Sets raw tags input.
-     */
-    public void setCustomTags(String customTags) {
-        this.customTags = customTags;
-    }
-
-    /**
-     * Returns raw categories input.
-     */
-    public String getCustomCategories() {
-        return customCategories;
-    }
-
-    /**
-     * Sets raw categories input.
-     */
-    public void setCustomCategories(String customCategories) {
-        this.customCategories = customCategories;
-    }
 }

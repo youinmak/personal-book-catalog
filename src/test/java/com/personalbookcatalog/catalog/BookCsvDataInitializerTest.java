@@ -46,7 +46,6 @@ class BookCsvDataInitializerTest {
         assertThat(imported.getFirst().getBookNameEn()).isEqualTo("Uchalya");
         assertThat(imported.getFirst().getAuthorNameEn()).isEqualTo("Lakshman Gaikwad");
         assertThat(imported.getFirst().getReadingStatus()).isEqualTo(ReadingStatus.FINISHED);
-        assertThat(imported.getFirst().getGenre()).isEqualTo("Unknown");
         assertThat(imported.getFirst().getBookLanguage()).isEqualTo("Marathi");
         assertThat(imported.getFirst().getLocation()).isEqualTo("Asad");
         assertThat(Files.exists(marker)).isTrue();
