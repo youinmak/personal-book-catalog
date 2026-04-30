@@ -72,7 +72,6 @@ public class BookController {
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("readingStatuses", List.of(ReadingStatus.values()));
-        model.addAttribute("genreSuggestions", bookService.getGenreSuggestions());
         model.addAttribute("languageSuggestions", bookService.getLanguageSuggestions());
 
         if (!model.containsAttribute("newBookForm")) {

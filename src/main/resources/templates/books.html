@@ -237,10 +237,10 @@
         <h1 th:text="#{app.title}">Personal Book Catalog</h1>
         <div class="actions">
             <a class="btn-link btn-muted"
-               th:href="@{/books(lang='en',page=${currentPage},wishlistId=${activeWishlistId},query=${criteria.query},readingStatus=${criteria.readingStatus},minRating=${criteria.minRating},genre=${criteria.genre},bookLanguage=${criteria.bookLanguage},tags=${criteria.tags},categories=${criteria.categories},sortBy=${criteria.sortBy},sortDir=${criteria.sortDir})}"
+               th:href="@{/books(lang='en',page=${currentPage},wishlistId=${activeWishlistId},query=${criteria.query},readingStatus=${criteria.readingStatus},bookLanguage=${criteria.bookLanguage},sortBy=${criteria.sortBy},sortDir=${criteria.sortDir})}"
                th:text="#{lang.english}">EN</a>
             <a class="btn-link btn-muted"
-               th:href="@{/books(lang='mr',page=${currentPage},wishlistId=${activeWishlistId},query=${criteria.query},readingStatus=${criteria.readingStatus},minRating=${criteria.minRating},genre=${criteria.genre},bookLanguage=${criteria.bookLanguage},tags=${criteria.tags},categories=${criteria.categories},sortBy=${criteria.sortBy},sortDir=${criteria.sortDir})}"
+               th:href="@{/books(lang='mr',page=${currentPage},wishlistId=${activeWishlistId},query=${criteria.query},readingStatus=${criteria.readingStatus},bookLanguage=${criteria.bookLanguage},sortBy=${criteria.sortBy},sortDir=${criteria.sortDir})}"
                th:text="#{lang.marathi}">मराठी</a>
             <span sec:authorize="isAuthenticated()"><span th:text="#{header.signedInAs}">Signed in as</span> <strong sec:authentication="name"></strong></span>
             <a sec:authorize="isAnonymous()" th:href="@{/login}" class="btn-link btn-primary" th:text="#{header.login}">Login</a>
@@ -280,21 +280,6 @@
                         </select>
                     </div>
                     <div>
-                        <label for="rating" th:text="#{label.rating}">Rating (1-5)</label>
-                        <select id="rating" th:field="*{rating}">
-                            <option value="" th:text="#{option.notRated}">Not rated</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="genre" th:text="#{label.genre}">Genre</label>
-                        <input id="genre" type="text" list="genre-options" th:field="*{genre}" th:placeholder="#{placeholder.genre}" maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
-                    </div>
-                    <div>
                         <label for="bookLanguage" th:text="#{label.bookLanguage}">Book Language</label>
                         <input id="bookLanguage" type="text" list="language-options" th:field="*{bookLanguage}" th:placeholder="#{placeholder.bookLanguage}" maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                     </div>
@@ -302,23 +287,12 @@
                         <label for="location" th:text="#{label.location}">Location</label>
                         <input id="location" type="text" th:field="*{location}" th:placeholder="#{placeholder.location}" maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                     </div>
-                    <div>
-                        <label for="customTags" th:text="#{label.customTags}">Custom Tags (comma-separated)</label>
-                        <input id="customTags" type="text" th:field="*{customTags}" th:placeholder="#{placeholder.customTags}" maxlength="1000" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
-                    </div>
-                    <div>
-                        <label for="customCategories" th:text="#{label.customCategories}">Custom Categories (comma-separated)</label>
-                        <input id="customCategories" type="text" th:field="*{customCategories}" th:placeholder="#{placeholder.customCategories}" maxlength="1000" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
-                    </div>
                 </div>
                 <div class="actions">
                     <button type="submit" class="btn-primary" th:text="#{button.addBook}">Add Book</button>
                     <button type="reset" class="btn-muted" th:text="#{button.clear}">Clear</button>
                 </div>
             </form>
-            <datalist id="genre-options">
-                <option th:each="item : ${genreSuggestions}" th:value="${item}"></option>
-            </datalist>
             <datalist id="language-options">
                 <option th:each="item : ${languageSuggestions}" th:value="${item}"></option>
             </datalist>
@@ -432,31 +406,8 @@
                     </select>
                 </div>
                 <div>
-                    <label for="minRating" th:text="#{label.minimumRating}">Minimum Rating</label>
-                    <select id="minRating" th:field="*{minRating}">
-                        <option value="" th:text="#{option.minRating.any}">Any</option>
-                        <option value="1" th:text="#{option.minRating.1}">1+</option>
-                        <option value="2" th:text="#{option.minRating.2}">2+</option>
-                        <option value="3" th:text="#{option.minRating.3}">3+</option>
-                        <option value="4" th:text="#{option.minRating.4}">4+</option>
-                        <option value="5" th:text="#{option.minRating.5}">5</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="criteriaGenre" th:text="#{label.genre}">Genre</label>
-                    <input id="criteriaGenre" type="text" list="genre-options" th:field="*{genre}" th:placeholder="#{placeholder.genre}" maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
-                </div>
-                <div>
                     <label for="criteriaLanguage" th:text="#{label.bookLanguage}">Book Language</label>
                     <input id="criteriaLanguage" type="text" list="language-options" th:field="*{bookLanguage}" th:placeholder="#{placeholder.bookLanguage}" maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
-                </div>
-                <div>
-                    <label for="criteriaTags" th:text="#{label.tags}">Tags (comma-separated)</label>
-                    <input id="criteriaTags" type="text" th:field="*{tags}" th:placeholder="#{placeholder.criteriaTags}" maxlength="500" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
-                </div>
-                <div>
-                    <label for="criteriaCategories" th:text="#{label.categories}">Categories (comma-separated)</label>
-                    <input id="criteriaCategories" type="text" th:field="*{categories}" th:placeholder="#{placeholder.criteriaCategories}" maxlength="500" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                 </div>
                 <div>
                     <label for="sortBy" th:text="#{label.sortBy}">Sort By</label>
@@ -465,8 +416,6 @@
                         <option value="authorName" th:text="#{option.sortBy.authorName}">Author Name</option>
                         <option value="bookName" th:text="#{option.sortBy.bookName}">Book Name</option>
                         <option value="readingStatus" th:text="#{option.sortBy.readingStatus}">Reading Status</option>
-                        <option value="rating" th:text="#{option.sortBy.rating}">Rating</option>
-                        <option value="genre" th:text="#{option.sortBy.genre}">Genre</option>
                     </select>
                 </div>
                 <div>
@@ -521,35 +470,12 @@
                             </select>
                         </div>
                         <div>
-                            <label th:text="#{label.rating}">Rating (1-5)</label>
-                            <select name="rating">
-                                <option value="" th:selected="${book.rating == null}" th:text="#{option.notRated}">Not rated</option>
-                                <option value="1" th:selected="${book.rating == 1}">1</option>
-                                <option value="2" th:selected="${book.rating == 2}">2</option>
-                                <option value="3" th:selected="${book.rating == 3}">3</option>
-                                <option value="4" th:selected="${book.rating == 4}">4</option>
-                                <option value="5" th:selected="${book.rating == 5}">5</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label th:text="#{label.genre}">Genre</label>
-                            <input name="genre" type="text" list="genre-options" th:value="${book.genre}" maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
-                        </div>
-                        <div>
                             <label th:text="#{label.bookLanguage}">Book Language</label>
                             <input name="bookLanguage" type="text" list="language-options" th:value="${book.bookLanguage}" maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                         </div>
                         <div>
                             <label th:text="#{label.location}">Location</label>
                             <input name="location" type="text" th:value="${book.location}" maxlength="120" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
-                        </div>
-                        <div>
-                            <label th:text="#{label.customTags}">Custom Tags</label>
-                            <input name="customTags" type="text" th:value="${book.customTags}" maxlength="1000" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
-                        </div>
-                        <div>
-                            <label th:text="#{label.customCategories}">Custom Categories</label>
-                            <input name="customCategories" type="text" th:value="${book.customCategories}" maxlength="1000" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
                         </div>
                         <div class="actions">
                             <button type="submit" class="btn-primary" th:text="#{button.update}">Update</button>
@@ -561,12 +487,8 @@
                         <div th:text="${book.authorNameEn}"></div>
                         <div th:if="${book.authorNameMr}" th:text="${book.authorNameMr}"></div>
                         <div><span th:text="#{text.status}">Status</span>: <span th:text="${book.readingStatus}"></span></div>
-                        <div th:if="${book.rating != null}"><span th:text="#{text.rating}">Rating</span>: <span th:text="${book.rating}"></span></div>
-                        <div><span th:text="#{label.genre}">Genre</span>: <span th:text="${book.genre}"></span></div>
                         <div><span th:text="#{text.language}">Language</span>: <span th:text="${book.bookLanguage}"></span></div>
                         <div><span th:text="#{label.location}">Location</span>: <span th:text="${book.location}"></span></div>
-                        <div th:if="${book.customTags}"><span th:text="#{text.tags}">Tags</span>: <span th:text="${book.customTags}"></span></div>
-                        <div th:if="${book.customCategories}"><span th:text="#{text.categories}">Categories</span>: <span th:text="${book.customCategories}"></span></div>
                     </div>
                 </td>
                 <td>
@@ -587,11 +509,7 @@
                     wishlistId=${activeWishlistId},
                     query=${criteria.query},
                     readingStatus=${criteria.readingStatus},
-                    minRating=${criteria.minRating},
-                    genre=${criteria.genre},
                     bookLanguage=${criteria.bookLanguage},
-                    tags=${criteria.tags},
-                    categories=${criteria.categories},
                     sortBy=${criteria.sortBy},
                     sortDir=${criteria.sortDir}
                )}">
@@ -607,11 +525,7 @@
                     wishlistId=${activeWishlistId},
                     query=${criteria.query},
                     readingStatus=${criteria.readingStatus},
-                    minRating=${criteria.minRating},
-                    genre=${criteria.genre},
                     bookLanguage=${criteria.bookLanguage},
-                    tags=${criteria.tags},
-                    categories=${criteria.categories},
                     sortBy=${criteria.sortBy},
                     sortDir=${criteria.sortDir}
                )}">
@@ -624,11 +538,7 @@
                     wishlistId=${activeWishlistId},
                     query=${criteria.query},
                     readingStatus=${criteria.readingStatus},
-                    minRating=${criteria.minRating},
-                    genre=${criteria.genre},
                     bookLanguage=${criteria.bookLanguage},
-                    tags=${criteria.tags},
-                    categories=${criteria.categories},
                     sortBy=${criteria.sortBy},
                     sortDir=${criteria.sortDir}
                )}">

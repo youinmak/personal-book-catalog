@@ -121,7 +121,6 @@ class BookControllerIntegrationTest {
         book.setBookNameEn("Old Name");
         book.setAuthorNameEn("Old Author");
         book.setReadingStatus(ReadingStatus.UNREAD);
-        book.setGenre("Unknown");
         book.setBookLanguage("Unknown");
         book = bookRepository.save(book);
 
@@ -132,12 +131,8 @@ class BookControllerIntegrationTest {
                         .param("authorNameEn", "New Author")
                         .param("authorNameMr", "नवीन लेखक")
                         .param("readingStatus", "FINISHED")
-                        .param("rating", "4")
-                        .param("genre", "Fiction")
                         .param("bookLanguage", "English")
-                        .param("location", "Shelf A")
-                        .param("customTags", "memoir")
-                        .param("customCategories", "classics"))
+                        .param("location", "Shelf A"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/books"));
 
@@ -145,7 +140,6 @@ class BookControllerIntegrationTest {
         assertThat(updated.getBookNameEn()).isEqualTo("New Name");
         assertThat(updated.getAuthorNameMr()).isEqualTo("नवीन लेखक");
         assertThat(updated.getReadingStatus()).isEqualTo(ReadingStatus.FINISHED);
-        assertThat(updated.getRating()).isEqualTo(4);
         assertThat(updated.getLocation()).isEqualTo("Shelf A");
     }
 
@@ -156,7 +150,6 @@ class BookControllerIntegrationTest {
         book.setBookNameEn("To Delete");
         book.setAuthorNameEn("Author");
         book.setReadingStatus(ReadingStatus.UNREAD);
-        book.setGenre("Unknown");
         book.setBookLanguage("Unknown");
         book = bookRepository.save(book);
 
@@ -175,7 +168,6 @@ class BookControllerIntegrationTest {
         one.setBookNameMr("अॅटोमिक हॅबिट्स");
         one.setAuthorNameMr("जेम्स क्लिअर");
         one.setReadingStatus(ReadingStatus.FINISHED);
-        one.setGenre("Self-Help");
         one.setBookLanguage("English");
         bookRepository.save(one);
 
@@ -183,7 +175,6 @@ class BookControllerIntegrationTest {
         two.setBookNameEn("Clean Code");
         two.setAuthorNameEn("Robert Martin");
         two.setReadingStatus(ReadingStatus.UNREAD);
-        two.setGenre("Technology");
         two.setBookLanguage("English");
         bookRepository.save(two);
 
@@ -197,45 +188,32 @@ class BookControllerIntegrationTest {
     void filterAndSort_shouldApplyCombinedCriteria() throws Exception {
         Book one = new Book();
         one.setBookNameEn("Book One");
-        one.setAuthorNameEn("Author A");
+        one.setAuthorNameEn("Author B");
         one.setReadingStatus(ReadingStatus.FINISHED);
-        one.setRating(5);
-        one.setGenre("Fiction");
         one.setBookLanguage("English");
-        one.setCustomTags("memoir, dalit");
         bookRepository.save(one);
 
         Book two = new Book();
         two.setBookNameEn("Book Two");
-        two.setAuthorNameEn("Author B");
+        two.setAuthorNameEn("Author A");
         two.setReadingStatus(ReadingStatus.FINISHED);
-        two.setRating(3);
-        two.setGenre("Fiction");
         two.setBookLanguage("English");
-        two.setCustomTags("memoir");
         bookRepository.save(two);
 
         Book noMatch = new Book();
         noMatch.setBookNameEn("Book Three");
         noMatch.setAuthorNameEn("Author C");
         noMatch.setReadingStatus(ReadingStatus.UNREAD);
-        noMatch.setRating(5);
-        noMatch.setGenre("Mystery");
         noMatch.setBookLanguage("Marathi");
-        noMatch.setCustomTags("science");
         bookRepository.save(noMatch);
 
         mockMvc.perform(get("/books")
                         .param("readingStatus", "FINISHED")
-                        .param("minRating", "4")
-                        .param("genre", "Fiction")
                         .param("bookLanguage", "English")
-                        .param("tags", "dalit")
-                        .param("sortBy", "rating")
-                        .param("sortDir", "desc"))
+                        .param("sortBy", "authorName")
+                        .param("sortDir", "asc"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Book One")))
-                .andExpect(content().string(not(containsString("Book Two"))))
                 .andExpect(content().string(not(containsString("Book Three"))));
     }
 
