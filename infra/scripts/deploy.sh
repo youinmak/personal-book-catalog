@@ -47,9 +47,11 @@ ssh -i "${SSH_KEY_PATH}" -o StrictHostKeyChecking=accept-new "${REMOTE}" \
   "if ! sudo grep -q '^EnvironmentFile=-/opt/personal-book-catalog/app.env$' /etc/systemd/system/personal-book-catalog.service; then \
      sudo sed -i '/^WorkingDirectory=/a EnvironmentFile=-/opt/personal-book-catalog/app.env' /etc/systemd/system/personal-book-catalog.service; \
    fi && \
+   sudo systemctl stop personal-book-catalog.service && \
    sudo mv /tmp/app.jar /opt/personal-book-catalog/app.jar && \
    sudo mv /tmp/BookList.csv /opt/personal-book-catalog/data/BookList.csv && \
    sudo mv /tmp/app.env /opt/personal-book-catalog/app.env && \
+   sudo rm -f /opt/personal-book-catalog/data/booksdb.mv.db /opt/personal-book-catalog/data/.book-bootstrap.done && \
    sudo chmod 600 /opt/personal-book-catalog/app.env && \
    sudo chown -R bookcatalog:bookcatalog /opt/personal-book-catalog && \
    sudo systemctl daemon-reload && \
