@@ -155,7 +155,7 @@ public class BookService {
      * Builds comparator for requested sort field and direction.
      */
     private Comparator<Book> buildComparator(String sortBy, String sortDir) {
-        boolean asc = "asc".equalsIgnoreCase(sortDir);
+        boolean asc = !"desc".equalsIgnoreCase(sortDir);
         String normalizedSortBy = StringUtils.hasText(sortBy) ? sortBy.trim().toLowerCase() : "id";
 
         return switch (normalizedSortBy) {

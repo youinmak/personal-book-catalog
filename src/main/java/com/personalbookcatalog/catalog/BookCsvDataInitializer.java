@@ -28,6 +28,7 @@ import org.springframework.util.StringUtils;
 public class BookCsvDataInitializer implements ApplicationRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(BookCsvDataInitializer.class);
+    private static final String DEFAULT_LOCATION = "Asad";
 
     private final BookRepository bookRepository;
     private final String csvPath;
@@ -89,6 +90,9 @@ public class BookCsvDataInitializer implements ApplicationRunner {
                 }
                 String bookNameEn = normalize(record.get(0));
                 String authorNameEn = normalize(record.get(1));
+                String location = record.size() >= 3 ? normalize(record.get(2)) : null;
+                String bookNameMr = record.size() >= 4 ? normalize(record.get(3)) : null;
+                String authorNameMr = record.size() >= 5 ? normalize(record.get(4)) : null;
                 if (firstRecord && "Book Title".equalsIgnoreCase(bookNameEn)
                         && "Book Author".equalsIgnoreCase(authorNameEn)) {
                     firstRecord = false;
@@ -100,10 +104,12 @@ public class BookCsvDataInitializer implements ApplicationRunner {
                 }
                 Book book = new Book();
                 book.setBookNameEn(bookNameEn);
+                book.setBookNameMr(bookNameMr);
                 book.setAuthorNameEn(authorNameEn);
+                book.setAuthorNameMr(authorNameMr);
                 book.setReadingStatus(ReadingStatus.FINISHED);
                 book.setBookLanguage("Marathi");
-                book.setLocation("Asad");
+                book.setLocation(StringUtils.hasText(location) ? location : DEFAULT_LOCATION);
                 books.add(book);
             }
         } catch (IOException exception) {
