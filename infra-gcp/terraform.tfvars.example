@@ -1,0 +1,12 @@
+ssh_username        = "your-linux-user"
+ssh_public_key_path = "~/.ssh/id_rsa.pub"
+ssh_allowed_cidr    = "203.0.113.5/32"
+
+# Optional overrides:
+# gcp_region        = "us-central1"
+# gcp_zone          = "us-central1-a"
+# project_name      = "personal-book-catalog"
+# machine_type      = "e2-micro"
+# boot_disk_size_gb = 10
+# subnet_cidr       = "10.10.0.0/24"
+# app_port          = 8080
