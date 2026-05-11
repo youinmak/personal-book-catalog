@@ -31,3 +31,4 @@ infra-gcp/override.tf
 infra-gcp/override.tf.json
 infra-gcp/*_override.tf
 infra-gcp/*_override.tf.json
+data/*.mv.db

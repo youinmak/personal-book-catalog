@@ -447,21 +447,25 @@
                 <td th:text="${book.id}"></td>
                 <td>
                     <form class="row-form" th:action="@{|/books/${book.id}/update|}" method="post" sec:authorize="hasRole('ADMIN')">
-                        <div>
+                        <div th:if="${#locale.language == 'mr'}">
+                            <label th:text="#{label.bookNameMr}">Book Name (Marathi)</label>
+                            <input name="bookNameMr" type="text" required th:value="${book.bookNameMr}" maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
+                            <input name="bookNameEn" type="hidden" th:value="${book.bookNameEn}">
+                        </div>
+                        <div th:if="${#locale.language != 'mr'}">
                             <label th:text="#{label.bookNameEn}">Book Name (English) *</label>
                             <input name="bookNameEn" type="text" required th:value="${book.bookNameEn}" maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
+                            <input name="bookNameMr" type="hidden" th:value="${book.bookNameMr}">
                         </div>
-                        <div>
-                            <label th:text="#{label.bookNameMr}">Book Name (Marathi)</label>
-                            <input name="bookNameMr" type="text" th:value="${book.bookNameMr}" maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
+                        <div th:if="${#locale.language == 'mr'}">
+                            <label th:text="#{label.authorNameMr}">Author Name (Marathi)</label>
+                            <input name="authorNameMr" type="text" required th:value="${book.authorNameMr}" maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
+                            <input name="authorNameEn" type="hidden" th:value="${book.authorNameEn}">
                         </div>
-                        <div>
+                        <div th:if="${#locale.language != 'mr'}">
                             <label th:text="#{label.authorNameEn}">Author Name (English) *</label>
                             <input name="authorNameEn" type="text" required th:value="${book.authorNameEn}" maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
-                        </div>
-                        <div>
-                            <label th:text="#{label.authorNameMr}">Author Name (Marathi)</label>
-                            <input name="authorNameMr" type="text" th:value="${book.authorNameMr}" maxlength="300" pattern="[^<>]*" th:title="#{validation.noAngleBrackets}">
+                            <input name="authorNameMr" type="hidden" th:value="${book.authorNameMr}">
                         </div>
                         <div>
                             <label th:text="#{label.readingStatus}">Reading Status</label>
@@ -482,10 +486,10 @@
                         </div>
                     </form>
                     <div sec:authorize="isAnonymous()">
-                        <div><strong th:text="${book.bookNameEn}"></strong></div>
-                        <div th:if="${book.bookNameMr}" th:text="${book.bookNameMr}"></div>
-                        <div th:text="${book.authorNameEn}"></div>
-                        <div th:if="${book.authorNameMr}" th:text="${book.authorNameMr}"></div>
+                        <div th:if="${#locale.language == 'mr'}"><strong th:text="${book.bookNameMr ?: book.bookNameEn}"></strong></div>
+                        <div th:if="${#locale.language != 'mr'}"><strong th:text="${book.bookNameEn}"></strong></div>
+                        <div th:if="${#locale.language == 'mr'}" th:text="${book.authorNameMr ?: book.authorNameEn}"></div>
+                        <div th:if="${#locale.language != 'mr'}" th:text="${book.authorNameEn}"></div>
                         <div><span th:text="#{text.status}">Status</span>: <span th:text="${book.readingStatus}"></span></div>
                         <div><span th:text="#{text.language}">Language</span>: <span th:text="${book.bookLanguage}"></span></div>
                         <div><span th:text="#{label.location}">Location</span>: <span th:text="${book.location}"></span></div>
