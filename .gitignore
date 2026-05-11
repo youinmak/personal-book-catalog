@@ -2,6 +2,7 @@
 /.idea/
 /*.iml
 /.DS_Store
+.DS_Store
 *.pem
 
 # Terraform local artifacts
@@ -11,3 +12,22 @@ infra/terraform.tfstate
 infra/terraform.tfstate.*
 infra/*.tfvars
 infra/*.tfplan
+infra/crash.log
+infra/crash.*.log
+infra/override.tf
+infra/override.tf.json
+infra/*_override.tf
+infra/*_override.tf.json
+
+# GCP Terraform local artifacts
+infra-gcp/.terraform/
+infra-gcp/terraform.tfstate
+infra-gcp/terraform.tfstate.*
+infra-gcp/*.tfvars
+infra-gcp/*.tfplan
+infra-gcp/crash.log
+infra-gcp/crash.*.log
+infra-gcp/override.tf
+infra-gcp/override.tf.json
+infra-gcp/*_override.tf
+infra-gcp/*_override.tf.json
